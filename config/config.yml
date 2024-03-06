@@ -236,8 +236,12 @@ cameras:
         input_args: -re -stream_loop -1 -fflags +genpts
         roles:
         - detect
+        # - record
+        # - rtmp
+      - path: http://192.168.0.39:8080/video
+        input_args: -re -stream_loop -1 -fflags +genpts
+        roles:
         - record
-        - rtmp
 
     zones:
       # zone_0:
