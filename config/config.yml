@@ -231,6 +231,7 @@ cameras:
     enabled: true
 
     ffmpeg:
+      hwaccel_args: preset-nvidia-h264
       inputs:
       - path: http://192.168.0.39:8080/video
         input_args: -re -stream_loop -1 -fflags +genpts
