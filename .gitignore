@@ -1,3 +1,4 @@
 config/db.py
 storage/recordings
 *.ipynb
+*.jpg
