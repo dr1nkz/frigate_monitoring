@@ -165,6 +165,42 @@ objects:
   # NOTE: This mask is COMBINED with the object type specific mask below
   # mask: 0,0,1000,0,1000,200,0,200  
 
+# Optional: Detectors configuration. Defaults to a single CPU detector
+detectors:
+  # Required: name of the detector
+  detector_name:
+    # Required: type of the detector
+    # Frigate provided types include 'cpu', 'edgetpu', 'openvino' and 'tensorrt' (default: shown below)
+    # Additional detector types can also be plugged in.
+    # Detectors may require additional configuration.
+    # Refer to the Detectors configuration page for more information.
+    type: cpu
+
+# Optional: model modifications
+model:
+  # Optional: path to the model (default: automatic based on detector)
+  path: /cpu_model.tflite
+  # path: /config/yolov8n.pt
+  # Optional: path to the labelmap (default: shown below)
+  labelmap_path: /labelmap.txt
+  # Required: Object detection model input width (default: shown below)
+  width: 320
+  # Required: Object detection model input height (default: shown below)
+  height: 320
+  # Optional: Object detection model input colorspace
+  # Valid values are rgb, bgr, or yuv. (default: shown below)
+  input_pixel_format: rgb
+  # Optional: Object detection model input tensor format
+  # Valid values are nhwc or nchw (default: shown below)
+  input_tensor: nhwc
+  # Optional: Object detection model type, currently only used with the OpenVINO detector
+  # Valid values are ssd, yolox, yolov5, or yolov8 (default: shown below)
+  model_type: ssd
+  # model_type: yolov8
+  # Optional: Label name modifications. These are merged into the standard labelmap.
+  # labelmap:
+  #   2: vehicle
+
 record:
   # Optional: Enable recording (default: shown below)
   # WARNING: If recording is disabled in the config, turning it on via
