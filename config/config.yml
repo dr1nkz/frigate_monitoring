@@ -180,7 +180,7 @@ detectors:
 model:
   # Optional: path to the model (default: automatic based on detector)
   path: /cpu_model.tflite
-  # path: /config/yolov8n.pt
+  # path: /config/yolov8n_32.tflite
   # Optional: path to the labelmap (default: shown below)
   labelmap_path: /labelmap.txt
   # Required: Object detection model input width (default: shown below)
@@ -193,6 +193,7 @@ model:
   # Optional: Object detection model input tensor format
   # Valid values are nhwc or nchw (default: shown below)
   input_tensor: nhwc
+  # input_tensor: nchw
   # Optional: Object detection model type, currently only used with the OpenVINO detector
   # Valid values are ssd, yolox, yolov5, or yolov8 (default: shown below)
   model_type: ssd
@@ -205,7 +206,7 @@ record:
   # Optional: Enable recording (default: shown below)
   # WARNING: If recording is disabled in the config, turning it on via
   #          the UI or MQTT later will have no effect.
-  enabled: true
+  enabled: false
   # Optional: Number of minutes to wait between cleanup runs (default: shown below)
   # This can be used to reduce the frequency of deleting recording segments from disk if you want to minimize i/o
   expire_interval: 60
@@ -269,13 +270,13 @@ cameras:
     ffmpeg:
       hwaccel_args: preset-nvidia-h264
       inputs:
-      - path: http://192.168.0.39:8080/video
+      - path: http://192.168.0.40:8080/video
         input_args: -re -stream_loop -1 -fflags +genpts
         roles:
         - detect
         # - record
         # - rtmp
-      - path: http://192.168.0.39:8080/video
+      - path: http://192.168.0.40:8080/video
         input_args: -re -stream_loop -1 -fflags +genpts
         roles:
         - record
