@@ -4,6 +4,8 @@ services:
     container_name: frigate
     restart: unless-stopped
     image: ghcr.io/blakeblackshear/frigate:stable
+    environment:
+      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
     command: [ "python3", "/config/db.py", "120" ]
     volumes:
       - ./config:/config
