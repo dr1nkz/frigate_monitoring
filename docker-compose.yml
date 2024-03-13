@@ -3,10 +3,11 @@ services:
   frigate:
     container_name: frigate
     restart: unless-stopped
-    image: ghcr.io/blakeblackshear/frigate:stable
+    build: .
+    # image: ghcr.io/blakeblackshear/frigate:stable
     environment:
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
-    command: [ "python3", "/config/db.py", "120" ]
+    command: [ "python3", "/config/db.py", "120" ] # - "pip install --upgrade openvino"
     volumes:
       - ./config:/config
       - ./storage:/media/frigate
