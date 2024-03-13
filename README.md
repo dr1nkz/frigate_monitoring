@@ -6,7 +6,7 @@
 docker compose up -d
 
 ### Просмотр логов
-docker compose logs -f
+docker compose logs -f \
 Ctrl + C - закрыть
 
 ## Настройка Frigate
