@@ -1,5 +1,7 @@
 mqtt:
   enabled: false
+  user: user
+  password: user
 
 detect:
   # Optional: width of the frame for the input with the detect role (default: use native stream resolution)
@@ -373,13 +375,15 @@ cameras:
     ffmpeg:
       hwaccel_args: preset-nvidia-h264
       inputs:
-      - path: http://192.168.0.40:8080/video
+      # - path: rtsp://admin:admin@192.168.0.39:1935
+      - path: http://192.168.0.39:8080/video
         input_args: -re -stream_loop -1 -fflags +genpts
         roles:
         - detect
         # - record
         # - rtmp
-      - path: http://192.168.0.40:8080/video
+      # - path: rtsp://admin:admin@192.168.0.39:1935
+      - path: http://192.168.0.39:8080/video
         input_args: -re -stream_loop -1 -fflags +genpts
         roles:
         - record
