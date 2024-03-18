@@ -1,7 +1,26 @@
 mqtt:
-  enabled: false
-  user: user
-  password: user
+  # Optional: Enable mqtt server (default: shown below)
+  enabled: True
+  # Required: host name
+  host: nanomq
+  # Optional: port (default: shown below)
+  port: 1883
+  # Optional: topic prefix (default: shown below)
+  # NOTE: must be unique if you are running multiple instances
+  topic_prefix: frigate
+  # Optional: client id (default: shown below)
+  # NOTE: must be unique if you are running multiple instances
+  client_id: frigate
+  # Optional: user
+  # NOTE: MQTT user can be specified with an environment variable or docker secrets that must begin with 'FRIGATE_'.
+  #       e.g. user: '{FRIGATE_MQTT_USER}'
+  # user: user
+  # Optional: password
+  # NOTE: MQTT password can be specified with an environment variable or docker secrets that must begin with 'FRIGATE_'.
+  #       e.g. password: '{FRIGATE_MQTT_PASSWORD}'
+  # password: user
+  # Optional: interval in seconds for publishing stats (default: shown below)
+  stats_interval: 60
 
 detect:
   # Optional: width of the frame for the input with the detect role (default: use native stream resolution)
@@ -375,16 +394,16 @@ cameras:
     ffmpeg:
       hwaccel_args: preset-nvidia-h264
       inputs:
-      # - path: rtsp://admin:admin@192.168.0.39:1935
-      - path: http://192.168.0.39:8080/video
-        input_args: -re -stream_loop -1 -fflags +genpts
+      - path: rtsp://admin:admin@192.168.0.39:1935
+      # - path: http://192.168.0.39:8080/video
+      #   input_args: -re -stream_loop -1 -fflags +genpts
         roles:
         - detect
         # - record
         # - rtmp
-      # - path: rtsp://admin:admin@192.168.0.39:1935
-      - path: http://192.168.0.39:8080/video
-        input_args: -re -stream_loop -1 -fflags +genpts
+      - path: rtsp://admin:admin@192.168.0.39:1935
+      # - path: http://192.168.0.39:8080/video
+      #   input_args: -re -stream_loop -1 -fflags +genpts
         roles:
         - record
 

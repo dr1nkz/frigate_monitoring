@@ -1,5 +1,24 @@
 version: "3.9"
 services:
+
+  mqttx:
+    image: emqx/mqttx-web:latest
+    container_name: mqttx
+    ports:
+      - 80:80
+    # docker run -d --name mqttx-web -p 80:80 
+
+  nanomq:
+    image: emqx/nanomq:0.18.2-slim
+    container_name: nanomq
+    restart: unless-stopped
+    ports:
+      - 1883:1883
+      - 8083:8083
+      - 8883:8883
+    volumes:
+      - ./mqtt/nanomq.conf:/etc/nanomq.conf
+
   frigate:
     container_name: frigate
     restart: unless-stopped
