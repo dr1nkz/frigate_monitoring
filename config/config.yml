@@ -230,93 +230,96 @@ detect:
 objects:
   # Optional: list of objects to track from labelmap.txt (default: shown below)
   track:
-  - person
-  - bicycle
-  - car
-  - motorcycle
-  - airplane
-  - bus
-  - train
-  - truck
-  - boat
-  - trafficlight
-  - firehydrant
-  - stopsign
-  - parkingmeter
-  - bench
-  - bird
-  - cat
-  - dog
-  - horse
-  - sheep
-  - cow
-  - elephant
-  - bear
-  - zebra
-  - giraffe
-  - backpack
-  - umbrella
-  - handbag
-  - tie
-  - suitcase
-  - frisbee
-  - skis
-  - snowboard
-  - sportsball
-  - kite
-  - baseballbat
-  - baseballglove
-  - skateboard
-  - surfboard
-  - tennisracket
-  - bottle
-  - wineglass
-  - cup
-  - fork
-  - knife
-  - spoon
-  - bowl
-  - banana
-  - apple
-  - sandwich
-  - orange
-  - broccoli
-  - carrot
-  - hotdog
-  - pizza
-  - donut
-  - cake
-  - chair
-  - couch
-  - pottedplant
-  - bed
-  - diningtable
-  - toilet
-  - tv
-  - laptop
-  - mouse
-  - remote
-  - keyboard
-  - cellphone
-  - microwave
-  - oven
-  - toaster
-  - sink
-  - refrigerator
-  - book
-  - clock
-  - vase
-  - scissors
-  - teddybear
-  - hairdrier
-  - toothbrush
+  - Forklift
+  - Person
+  # - person
+  # - bicycle
+  # - car
+  # - motorcycle
+  # - airplane
+  # - bus
+  # - train
+  # - truck
+  # - boat
+  # - trafficlight
+  # - firehydrant
+  # - stopsign
+  # - parkingmeter
+  # - bench
+  # - bird
+  # - cat
+  # - dog
+  # - horse
+  # - sheep
+  # - cow
+  # - elephant
+  # - bear
+  # - zebra
+  # - giraffe
+  # - backpack
+  # - umbrella
+  # - handbag
+  # - tie
+  # - suitcase
+  # - frisbee
+  # - skis
+  # - snowboard
+  # - sportsball
+  # - kite
+  # - baseballbat
+  # - baseballglove
+  # - skateboard
+  # - surfboard
+  # - tennisracket
+  # - bottle
+  # - wineglass
+  # - cup
+  # - fork
+  # - knife
+  # - spoon
+  # - bowl
+  # - banana
+  # - apple
+  # - sandwich
+  # - orange
+  # - broccoli
+  # - carrot
+  # - hotdog
+  # - pizza
+  # - donut
+  # - cake
+  # - chair
+  # - couch
+  # - pottedplant
+  # - bed
+  # - diningtable
+  # - toilet
+  # - tv
+  # - laptop
+  # - mouse
+  # - remote
+  # - keyboard
+  # - cellphone
+  # - microwave
+  # - oven
+  # - toaster
+  # - sink
+  # - refrigerator
+  # - book
+  # - clock
+  # - vase
+  # - scissors
+  # - teddybear
+  # - hairdrier
+  # - toothbrush
 
 detectors:
   ov:
     type: openvino
     device: AUTO
     model:
-      path: /config/yolov8n.xml
+      # path: /config/yolov8n.xml
+      path: /config/hf.xml
 
 model:
   width: 640
@@ -324,7 +327,8 @@ model:
   input_tensor: nchw
   input_pixel_format: bgr
   model_type: yolov8
-  labelmap_path: /config/coco_80cl.txt
+  # labelmap_path: /config/coco_80cl.txt
+  labelmap_path: /config/hf_labelmap.txt
 
 record:
   # Optional: Enable recording (default: shown below)
