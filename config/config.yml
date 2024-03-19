@@ -1,3 +1,6 @@
+birdseye:
+  restream: true
+
 mqtt:
   # Optional: Enable mqtt server (default: shown below)
   enabled: True
@@ -14,11 +17,11 @@ mqtt:
   # Optional: user
   # NOTE: MQTT user can be specified with an environment variable or docker secrets that must begin with 'FRIGATE_'.
   #       e.g. user: '{FRIGATE_MQTT_USER}'
-  # user: user
+  user: user
   # Optional: password
   # NOTE: MQTT password can be specified with an environment variable or docker secrets that must begin with 'FRIGATE_'.
   #       e.g. password: '{FRIGATE_MQTT_PASSWORD}'
-  # password: user
+  password: user
   # Optional: interval in seconds for publishing stats (default: shown below)
   stats_interval: 60
 
@@ -230,8 +233,21 @@ detect:
 objects:
   # Optional: list of objects to track from labelmap.txt (default: shown below)
   track:
-  - Forklift
-  - Person
+  - каска
+  - нет-каски
+  - нет-жилета
+  - человек
+  - жилет
+
+  # - helmet
+  # - no-helmet
+  # - no-vest
+  # - person
+  # - vest
+
+  # - Forklift
+  # - Person
+
   # - person
   # - bicycle
   # - car
@@ -319,7 +335,8 @@ detectors:
     device: AUTO
     model:
       # path: /config/yolov8n.xml
-      path: /config/hf.xml
+      # path: /config/hf.xml
+      path: /config/helmets.xml
 
 model:
   width: 640
@@ -328,7 +345,8 @@ model:
   input_pixel_format: bgr
   model_type: yolov8
   # labelmap_path: /config/coco_80cl.txt
-  labelmap_path: /config/hf_labelmap.txt
+  # labelmap_path: /config/hf_labelmap.txt
+  labelmap_path: /config/helmets_labelmap_russian.txt
 
 record:
   # Optional: Enable recording (default: shown below)
