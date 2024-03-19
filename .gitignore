@@ -2,3 +2,4 @@
 storage/recordings
 test.ipynb
 *.jpg
+mqtt/*.mp4
