@@ -17,6 +17,7 @@ def set_retain_indefinitely_to_1(duration=120):
     # names = list(map(lambda x: x[0], cursor.description))
     # print(names)
 
+    # Set star in event (retain_indefinitely = 1)
     cursor.execute(
         f"UPDATE event SET retain_indefinitely = 1 WHERE end_time - start_time > {duration};")
     connect.commit()
