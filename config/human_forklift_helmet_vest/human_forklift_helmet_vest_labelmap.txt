@@ -1,0 +1,6 @@
+helmet
+no_helmet
+no_vest
+person
+vest
+forklift
