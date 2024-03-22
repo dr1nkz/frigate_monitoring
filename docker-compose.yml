@@ -26,10 +26,11 @@ services:
     # image: ghcr.io/blakeblackshear/frigate:stable
     environment:
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
-    command: [ "python3", "/config/db.py", "120" ] # - "pip install --upgrade openvino"
+    # command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
     volumes:
       - ./config:/config
       - ./storage:/media/frigate
+      # - ./mqtt:/mqtt
       - /etc/localtime:/etc/localtime
       - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
         target: /tmp/cache
@@ -48,3 +49,11 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [ gpu ]
+
+  mqtt_events_listener:
+    container_name: mqtt_events_listener
+    restart: unless-stopped
+    build: ./mqtt
+    command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
+    volumes:
+      - ./mqtt:/mqtt
