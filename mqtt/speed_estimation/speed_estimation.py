@@ -3,30 +3,15 @@ import time
 import argparse
 from datetime import datetime
 from collections import defaultdict, deque
+import json
 
 import cv2
 import numpy as np
 import requests
-import json
 
 from detector import YOLOv8
-from utils import compute_polygon_intersection
-
-
-class ViewTransformer:
-    def __init__(self, source: np.ndarray, target: np.ndarray) -> None:
-        source = source.astype(np.float32)
-        target = target.astype(np.float32)
-        self.m = cv2.getPerspectiveTransform(source, target)
-
-    def transform_points(self, points: np.ndarray) -> np.ndarray:
-        if points.size == 0:
-            return points
-
-        reshaped_points = points.reshape(-1, 1, 2).astype(np.float32)
-        transformed_points = cv2.perspectiveTransform(
-            reshaped_points, self.m)
-        return transformed_points.reshape(-1, 2)
+from request_utils import set_retain_to_true, set_sub_label
+from view_transformer import view_transformer
 
 
 SOURCE = np.array([
@@ -45,8 +30,6 @@ TARGET = np.array([
     [24, 249],
     [0, 249],
 ])
-view_transformer = ViewTransformer(source=SOURCE, target=TARGET)
-
 
 def speed_estimation(camera, event_id, login, password):
     """
@@ -82,6 +65,7 @@ def speed_estimation(camera, event_id, login, password):
     end_time = response_json['end_time']
 
     coordinates = defaultdict(lambda: deque(maxlen=fps))
+    transformer = view_transformer(source=SOURCE, target=TARGET)
 
     while cap.isOpened() and end_time is None:
         # Кадр с камеры
@@ -106,7 +90,7 @@ def speed_estimation(camera, event_id, login, password):
         # Bottom center anchors
         points = np.array([[x_1 + x_2 / 2, y]
                           for [x_1, _, x_2, y] in bounding_boxes])
-        points = view_transformer.transform_points(points=points).astype(int)
+        points = transformer.transform_points(points=points).astype(int)
 
         # for class_id, [_, y] in zip(class_ids, points):
         for class_id, [_, y] in enumerate(points):
@@ -140,6 +124,7 @@ def speed_estimation(camera, event_id, login, password):
         #     break
 
         out.write(detected_img) # frame
+        
         response = requests.get(
             f'http://localhost:5000/api/events/{event_id}').text
         response_json = json.loads(response)
@@ -148,6 +133,7 @@ def speed_estimation(camera, event_id, login, password):
     # cv2.destroyAllWindows()
     cap.release()
     out.release()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

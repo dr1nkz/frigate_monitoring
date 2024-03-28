@@ -58,3 +58,10 @@ services:
     command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
     volumes:
       - ./mqtt:/mqtt
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]

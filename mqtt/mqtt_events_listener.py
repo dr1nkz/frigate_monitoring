@@ -5,6 +5,9 @@ import requests
 from dotenv import load_dotenv
 import paho.mqtt.client as mqtt
 
+from request_utils import set_retain_to_true, set_sub_label
+
+
 load_dotenv()
 CAMERAS = os.getenv('CAMERAS').split()
 LOGIN = os.getenv('LOGIN')
@@ -14,30 +17,7 @@ LABELS = os.getenv('LABELS').split()
 DURATION = int(os.getenv('DURATION'))
 MAX_SPEED = int(os.getenv('MAX_SPEED'))
 
-
-def set_retain_to_true(id):
-    """
-    Sets retain to true for the event with matches id
-    """
-    url = f'http://frigate:5000/api/events/{id}/retain'
-    # set star
-    response = requests.post(url=url)
-    # remove star
-    # response = requests.delete(url=url)
-    print(response.json())
-
-
-def set_sub_label(id, sublabel):
-    """
-    Sets sublabel for the event with matches id
-    """
-    url = f'http://frigate:5000/api/events/{id}/sub_label'
-    data = {
-        "subLabel": sublabel
-    }
-    # Set sublabel
-    response = requests.post(url=url, json=data)
-    print(response.json())
+event_ids = []
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
@@ -57,7 +37,7 @@ def on_message(client, userdata, msg):
         payload = json.loads(str(msg.payload)[2:-1])
 
         # Required alues from payload
-        id = payload["after"]["id"]
+        event_id = payload["after"]["id"]
         start_time = payload["after"]["start_time"]
         end_time = payload["after"]["end_time"]
         label = payload["after"]["label"]
@@ -65,7 +45,7 @@ def on_message(client, userdata, msg):
         entered_zones = payload["after"]["entered_zones"]
         sub_label = payload["after"]["sub_label"]
 
-        print(f'{msg.topic} {id} {start_time} {end_time} \
+        print(f'{msg.topic} {event_id} {start_time} {end_time} \
         {label} {camera} {entered_zones}')
 
         # Unwanted object from camera in zone
@@ -73,8 +53,8 @@ def on_message(client, userdata, msg):
             if label in LABELS and camera in CAMERAS and entered_zone in ZONES:
                 sublabel_to_set = 'Unwanted object from camera in zone'
                 print('Unwanted object from camera in zone')
-                set_retain_to_true(id)
-                set_sub_label(id, sublabel_to_set)
+                set_retain_to_true(event_id)
+                set_sub_label(event_id, sublabel_to_set)
                 break
 
         # Event longer than stated
@@ -82,12 +62,13 @@ def on_message(client, userdata, msg):
             if end_time - start_time > DURATION:
                 sublabel_to_set = 'Event longer than stated'
                 print('Event longer than stated')
-                set_retain_to_true(id)
+                set_retain_to_true(event_id)
                 if sub_label is None:
-                    set_sub_label(id, sublabel_to_set)
+                    set_sub_label(event_id, sublabel_to_set)
 
         # Speed estimation
-        if end_time is not None:
+        if (end_time is not None) and not (event_id in event_ids):
+            event_ids.append(event_id)
             # speed_estimation(id)
             print('Speed estimation')
     else:
