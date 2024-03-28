@@ -17,7 +17,7 @@ services:
       - 8083:8083
       - 8883:8883
     volumes:
-      - ./mqtt/nanomq.conf:/etc/nanomq.conf
+      - ./nanomq/nanomq.conf:/etc/nanomq.conf
 
   frigate:
     container_name: frigate
@@ -58,6 +58,7 @@ services:
     command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
     volumes:
       - ./mqtt:/mqtt
+      - ./config/config.yml:/mqtt/config.yml
     deploy:
       resources:
         reservations:
