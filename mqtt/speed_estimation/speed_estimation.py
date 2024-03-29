@@ -10,7 +10,7 @@ import numpy as np
 import requests
 
 from detector import YOLOv8
-from request_utils import set_retain_to_true, set_sub_label, get_camera_address
+from request_utils import *
 from view_transformer import view_transformer
 
 
@@ -40,9 +40,10 @@ def speed_estimation(camera, event_id, login, password):
                              conf_thres=0.3,
                              iou_thres=0.5)
 
-    # Get camera address from api
+    # Get camera address
     # address = f'rtsp://localhost:8554/{camera}'
-    address = get_camera_address(camera, login, password)
+    # address = get_camera_address(camera, login, password)
+    address = get_camera_address_from_config(camera)
 
     # Videocapturing
     # cv2.namedWindow('stream', cv2.WINDOW_NORMAL)

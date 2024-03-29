@@ -1,5 +1,6 @@
 import requests
 import json
+import yaml
 
 
 def set_retain_to_true(id):
@@ -35,4 +36,15 @@ def get_camera_address(camera, login, password):
     response = json.loads(response)
     address = response["cameras"][camera]['ffmpeg']['inputs'][0]['path']
     address = address.replace('*', login, 1).replace('*', password, 1)
+    return address
+
+
+def get_camera_address_from_config(camera):
+    """
+    Gets camera address for :camera:
+    """
+    with open('/mqtt/config.yml', 'r') as file:
+        config = yaml.safe_load(file)
+
+    address = config['cameras'][camera]['ffmpeg']['inputs'][0]['path']
     return address
