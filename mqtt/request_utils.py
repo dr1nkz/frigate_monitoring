@@ -1,4 +1,5 @@
 import requests
+import json
 
 
 def set_retain_to_true(id):
@@ -24,3 +25,14 @@ def set_sub_label(id, sublabel):
     # Set sublabel
     response = requests.post(url=url, json=data)
     print(response.json())
+
+
+def get_camera_address(camera, login, password):
+    """
+    Gets camera address for :camera:
+    """
+    response = requests.get(r'http://frigate:5000/api/config').text
+    response = json.loads(response)
+    address = response["cameras"][camera]['ffmpeg']['inputs'][0]['path']
+    address = address.replace('*', login, 1).replace('*', password, 1)
+    return address

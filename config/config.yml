@@ -3,8 +3,9 @@
 #     listen: ":8554"    # RTSP Server TCP port, default - 8554
 #     streams:
 #       test: # <- for RTSP streams
-#         - rtsp://admin:admin@192.168.0.39:8854
-#         # - ffmpeg:test#video=h264#video=mjpeg
+#         - rtsp://mediamtx-server:8554/stream0.sdp
+#         # - ffmpeg:#yuv420p
+#         - ffmpeg:test#video=h264#video=mjpeg
 #         # - ffmpeg:rtsp://admin:admin@192.168.0.39:8854#video=h264#video=mjpeg
 
 birdseye:
@@ -231,23 +232,23 @@ cameras:
     ffmpeg:
       # hwaccel_args: preset-nvidia-h264
       inputs:
-        - path: rtsp://admin:admin@192.168.0.39:1935
-        # - path: http://192.168.0.39:8080/video
-        #   input_args: -re -stream_loop -1 -fflags +genpts
-          roles:
-            - detect
+        # - path: rtsp://admin:admin@192.168.0.39:1935
+        # # - path: http://192.168.0.39:8080/video
+        # #   input_args: -re -stream_loop -1 -fflags +genpts
+        #   roles:
+        #     - detect
           
-        - path: rtsp://admin:admin@192.168.0.39:1935
-        # - path: http://192.168.0.39:8080/video
-        #   input_args: -re -stream_loop -1 -fflags +genpts
-          roles:
-            - record
-
-        # - path: rtsp://127.0.0.1:8554/test
-        #   input_args: preset-rtsp-restream
+        # - path: rtsp://admin:admin@192.168.0.39:1935
+        # # - path: http://192.168.0.39:8080/video
+        # #   input_args: -re -stream_loop -1 -fflags +genpts
         #   roles:
         #     - record
-        #     - detect
+
+        - path: rtsp://mediamtx-server:8554/stream0.sdp
+          # input_args: preset-rtsp-restream
+          roles:
+            - record
+            - detect
 
     zones:
       # zone_0:

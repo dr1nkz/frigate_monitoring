@@ -10,7 +10,7 @@ import numpy as np
 import requests
 
 from detector import YOLOv8
-from request_utils import set_retain_to_true, set_sub_label
+from request_utils import set_retain_to_true, set_sub_label, get_camera_address
 from view_transformer import view_transformer
 
 
@@ -42,10 +42,7 @@ def speed_estimation(camera, event_id, login, password):
 
     # Get camera address from api
     # address = f'rtsp://localhost:8554/{camera}'
-    response = requests.get(r'http://localhost:5000/api/config').text
-    response = json.loads(response)
-    address = response["cameras"][camera]['ffmpeg']['inputs'][0]['path']
-    address = address.replace('*', login, 1).replace('*', password, 1)
+    address = get_camera_address(camera, login, password)
 
     # Videocapturing
     # cv2.namedWindow('stream', cv2.WINDOW_NORMAL)
@@ -59,6 +56,7 @@ def speed_estimation(camera, event_id, login, password):
     filename = f'mqtt/speed_estimation/videos/{camera}_{datetime.now().strftime(r'_%d.%m.%Y_%H:%M:%S')}.mp4'
     out = cv2.VideoWriter(filename, fourcc, 30, (width, height))
 
+    # Get end time of the event
     response = requests.get(
         f'http://localhost:5000/api/events/{event_id}').text
     response_json = json.loads(response)

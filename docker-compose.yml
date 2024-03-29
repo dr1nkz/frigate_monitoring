@@ -66,3 +66,15 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [ gpu ]
+
+  mediamtx:
+    platform: linux/amd64
+    container_name: mediamtx-server
+    image: bluenviron/mediamtx:latest-ffmpeg
+    environment:
+      - RTSP_PROTOCOLS=tcp
+    ports:
+      - 8189:8189
+      - 8889:8889
+      - 8854:8554
+    restart: unless-stopped
