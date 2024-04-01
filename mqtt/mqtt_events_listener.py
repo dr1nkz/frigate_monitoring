@@ -57,8 +57,15 @@ def on_message(client, userdata, msg):
                 set_sub_label(event_id, sublabel_to_set)
                 break
 
+        # Speed estimation
+        if (end_time is None) and not (event_id in event_ids):
+            event_ids.append(event_id)
+            # speed_estimation(id)
+            print('Speed estimation')
+
         # Event longer than stated
         if end_time is not None:
+            event_ids.remove(event_id)
             if end_time - start_time > DURATION:
                 sublabel_to_set = 'Event longer than stated'
                 print('Event longer than stated')
@@ -66,11 +73,6 @@ def on_message(client, userdata, msg):
                 if sub_label is None:
                     set_sub_label(event_id, sublabel_to_set)
 
-        # Speed estimation
-        if (end_time is not None) and not (event_id in event_ids):
-            event_ids.append(event_id)
-            # speed_estimation(id)
-            print('Speed estimation')
     else:
         print(msg.topic+" "+str(msg.payload))
 

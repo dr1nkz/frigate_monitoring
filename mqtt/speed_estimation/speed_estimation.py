@@ -1,17 +1,19 @@
 import os
-import time
 import argparse
 from datetime import datetime
 from collections import defaultdict, deque
 import json
+import sys
 
 import cv2
 import numpy as np
 import requests
 
-from detector import YOLOv8
-from request_utils import *
 from view_transformer import view_transformer
+from detector import YOLOv8
+
+sys.path.append("/mqtt")
+from request_utils import *
 
 
 SOURCE = np.array([
@@ -31,7 +33,8 @@ TARGET = np.array([
     [0, 249],
 ])
 
-def speed_estimation(camera, event_id, login, password):
+
+def speed_estimation(camera, event_id, permitted_speed):
     """
     Запуск модели
     """
@@ -54,17 +57,19 @@ def speed_estimation(camera, event_id, login, password):
     fps = int(cap.get(cv2.CAP_PROP_FPS))
 
     # Videowriting
-    filename = f'mqtt/speed_estimation/videos/{camera}_{datetime.now().strftime(r'_%d.%m.%Y_%H:%M:%S')}.mp4'
+    filename = 'mqtt/speed_estimation/videos/' + camera + '_' + \
+        datetime.now().strftime(r'_%d.%m.%Y_%H:%M:%S') + '.mp4'
     out = cv2.VideoWriter(filename, fourcc, 30, (width, height))
 
     # Get end time of the event
-    response = requests.get(
-        f'http://localhost:5000/api/events/{event_id}').text
-    response_json = json.loads(response)
-    end_time = response_json['end_time']
+    end_time = get_end_time(event_id)
 
+    # For affine transforms
     coordinates = defaultdict(lambda: deque(maxlen=fps))
     transformer = view_transformer(source=SOURCE, target=TARGET)
+
+    # Maximal detected speed
+    max_detected_speed = 0
 
     while cap.isOpened() and end_time is None:
         # Кадр с камеры
@@ -104,7 +109,9 @@ def speed_estimation(camera, event_id, login, password):
                 coordinate_end = coordinates[class_id][0]
                 distance = abs(coordinate_start - coordinate_end)
                 time = len(coordinates[class_id]) / fps
-                speed = distance / time * 3.6
+                speed = int(distance / time * 3.6)
+
+                max_detected_speed = speed if speed > max_detected_speed else max_detected_speed
 
                 caption = f'{int(speed)} km/h'  # надпись
                 font = cv2.FONT_HERSHEY_SIMPLEX  # font
@@ -122,8 +129,8 @@ def speed_estimation(camera, event_id, login, password):
         # if cv2.waitKey(1) & 0xFF == ord('q'):
         #     break
 
-        out.write(detected_img) # frame
-        
+        out.write(detected_img)  # frame
+
         response = requests.get(
             f'http://localhost:5000/api/events/{event_id}').text
         response_json = json.loads(response)
@@ -133,18 +140,24 @@ def speed_estimation(camera, event_id, login, password):
     cap.release()
     out.release()
 
+    if (max_detected_speed < permitted_speed):
+        if os.path.isfile(filename):
+            time.sleep(1)
+            os.remove(filename)
+    else:
+        set_retain_to_true(event_id)
+        set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('camera')
     parser.add_argument('event_id')
-    parser.add_argument('login')
-    parser.add_argument('password')
+    parser.add_argument('permitted speed')
     args = parser.parse_args()
 
     camera = args.camera
     event_id = args.event_id
-    login = args.login
-    password = args.password
+    permitted_speed = args.max_speed
 
-    speed_estimation(camera, event_id, login, password)
+    speed_estimation(camera, event_id, permitted_speed)
