@@ -1,6 +1,8 @@
 import json
 import os
 import requests
+import subprocess
+import multiprocessing
 
 from dotenv import load_dotenv
 import paho.mqtt.client as mqtt
@@ -18,6 +20,12 @@ DURATION = int(os.getenv('DURATION'))
 MAX_SPEED = int(os.getenv('MAX_SPEED'))
 
 event_ids = []
+processes = []
+
+
+def run_script(camera, event_id, permitted_speed):
+    subprocess.call(['python3', f'mqtt/speed_estimation/speed_estimation.py',
+                     camera, event_id, f'{permitted_speed}'])
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
@@ -60,8 +68,10 @@ def on_message(client, userdata, msg):
         # Speed estimation
         if (end_time is None) and not (event_id in event_ids):
             event_ids.append(event_id)
-            # speed_estimation(id)
-            print('Speed estimation')
+            process = multiprocessing.Process(
+                target=run_script, args=[camera, event_id, MAX_SPEED])
+            process.start()
+            processes.append(process)
 
         # Event longer than stated
         if end_time is not None:
@@ -75,6 +85,13 @@ def on_message(client, userdata, msg):
 
     else:
         print(msg.topic+" "+str(msg.payload))
+
+    for i, p in enumerate(processes):
+        if p.is_alive():
+            continue
+        else:
+            # Удаляем процесс из списка, если он завершил свою работу
+            del processes[i]
 
 
 mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)

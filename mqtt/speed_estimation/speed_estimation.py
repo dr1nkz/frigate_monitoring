@@ -1,3 +1,4 @@
+from request_utils import *
 import os
 import argparse
 from datetime import datetime
@@ -13,7 +14,6 @@ from view_transformer import view_transformer
 from detector import YOLOv8
 
 sys.path.append("/mqtt")
-from request_utils import *
 
 
 SOURCE = np.array([
@@ -153,11 +153,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('camera')
     parser.add_argument('event_id')
-    parser.add_argument('permitted speed')
+    parser.add_argument('permitted_speed')
     args = parser.parse_args()
 
     camera = args.camera
     event_id = args.event_id
-    permitted_speed = args.max_speed
+    permitted_speed = args.permitted_speed
 
     speed_estimation(camera, event_id, permitted_speed)
