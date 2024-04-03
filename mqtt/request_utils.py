@@ -60,7 +60,7 @@ def get_end_time(event_id):
     Get end time of the event
     """
     response = requests.get(
-        f'http://localhost:5000/api/events/{event_id}').text
+        f'http://frigate:5000/api/events/{event_id}').text
     response_json = json.loads(response)
     end_time = response_json['end_time']
 

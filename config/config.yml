@@ -115,15 +115,15 @@ objects:
       threshold: 0.7
       # Optional: mask to prevent this object type from being detected in certain areas (default: no mask)
       # Checks based on the bottom center of the bounding box of the object
-      mask:
-        - 0,480,341,480,347,0,0,0
+      # mask:
+      #   - 0,480,341,480,347,0,0,0
     helmet:
       # Optional: minimum score for the object to initiate tracking (default: shown below)
       min_score: 0.5
       # Optional: minimum decimal percentage for tracked object's computed score to be considered a true positive (default: shown below)
       threshold: 0.55
-      mask:
-        - 0,480,341,480,347,0,0,0
+      # mask:
+      #   - 0,480,341,480,347,0,0,0
     no-helmet:
       # Optional: minimum score for the object to initiate tracking (default: shown below)
       min_score: 0.5
@@ -139,8 +139,8 @@ objects:
       min_score: 0.5
       # Optional: minimum decimal percentage for tracked object's computed score to be considered a true positive (default: shown below)
       threshold: 0.55
-      mask:
-        - 0,480,341,480,347,0,0,0
+      # mask:
+      #   - 0,480,341,480,347,0,0,0
 
 
 detectors:

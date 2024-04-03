@@ -2,6 +2,6 @@
 storage/recordings
 test.ipynb
 *.jpg
-mqtt/*.mp4
+*.mp4
 mqtt/__pycache__
 mqtt/speed_estimation/__pycache__

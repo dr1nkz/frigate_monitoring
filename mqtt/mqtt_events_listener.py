@@ -23,8 +23,8 @@ event_ids = []
 processes = []
 
 
-def run_script(camera, event_id, permitted_speed):
-    subprocess.call(['python3', f'mqtt/speed_estimation/speed_estimation.py',
+def run_speed_estimation(camera, event_id, permitted_speed):
+    subprocess.call(['python3', f'speed_estimation/speed_estimation.py',
                      camera, event_id, f'{permitted_speed}'])
 
 
@@ -69,7 +69,7 @@ def on_message(client, userdata, msg):
         if (end_time is None) and not (event_id in event_ids):
             event_ids.append(event_id)
             process = multiprocessing.Process(
-                target=run_script, args=[camera, event_id, MAX_SPEED])
+                target=run_speed_estimation, args=[camera, event_id, MAX_SPEED])
             process.start()
             processes.append(process)
 

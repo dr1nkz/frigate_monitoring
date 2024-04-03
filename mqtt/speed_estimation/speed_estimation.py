@@ -1,4 +1,3 @@
-from request_utils import *
 import os
 import argparse
 from datetime import datetime
@@ -14,6 +13,7 @@ from view_transformer import view_transformer
 from detector import YOLOv8
 
 sys.path.append("/mqtt")
+from request_utils import *
 
 
 SOURCE = np.array([
@@ -38,7 +38,7 @@ def speed_estimation(camera, event_id, permitted_speed):
     """
     Запуск модели
     """
-    model_path = r'./human_forklift_helmet_vest.onnx'
+    model_path = r'speed_estimation/human_forklift_helmet_vest.onnx'
     yolov8_detector = YOLOv8(path=model_path,
                              conf_thres=0.3,
                              iou_thres=0.5)
@@ -57,9 +57,13 @@ def speed_estimation(camera, event_id, permitted_speed):
     fps = int(cap.get(cv2.CAP_PROP_FPS))
 
     # Videowriting
-    filename = 'mqtt/speed_estimation/videos/' + camera + '_' + \
-        datetime.now().strftime(r'_%d.%m.%Y_%H:%M:%S') + '.mp4'
-    out = cv2.VideoWriter(filename, fourcc, 30, (width, height))
+    directory = '/storage/' + datetime.now().strftime(r'%d.%m.%Y/')
+    if not os.path.isdir(directory):
+        os.mkdir(directory)
+    filename = directory + camera + \
+        datetime.now().strftime(r'_%H:%M:%S_') + event_id + '.mp4'
+    out = cv2.VideoWriter(filename, fourcc, fps, (width, height))
+    print(filename)
 
     # Get end time of the event
     end_time = get_end_time(event_id)
@@ -80,7 +84,7 @@ def speed_estimation(camera, event_id, permitted_speed):
         # Детектирование
         detected_img = frame.copy()
         bounding_boxes, scores, class_ids = yolov8_detector(detected_img)
-        print(bounding_boxes)
+        # print(bounding_boxes)
         bounding_boxes = np.array(bounding_boxes)
         detected_img = yolov8_detector.draw_detections(detected_img)
         if detected_img is None:
@@ -132,7 +136,7 @@ def speed_estimation(camera, event_id, permitted_speed):
         out.write(detected_img)  # frame
 
         response = requests.get(
-            f'http://localhost:5000/api/events/{event_id}').text
+            f'http://frigate:5000/api/events/{event_id}').text
         response_json = json.loads(response)
         end_time = response_json['end_time']
 
@@ -158,6 +162,6 @@ if __name__ == '__main__':
 
     camera = args.camera
     event_id = args.event_id
-    permitted_speed = args.permitted_speed
+    permitted_speed = int(args.permitted_speed)
 
     speed_estimation(camera, event_id, permitted_speed)

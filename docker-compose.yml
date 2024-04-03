@@ -59,6 +59,8 @@ services:
     volumes:
       - ./mqtt:/mqtt
       - ./config/config.yml:/mqtt/config.yml
+      - /etc/localtime:/etc/localtime
+      - ./storage/speed_estimation:/storage
     deploy:
       resources:
         reservations:
