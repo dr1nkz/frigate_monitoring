@@ -1,16 +1,17 @@
-import os
 import argparse
-from datetime import datetime
 from collections import defaultdict, deque
+from datetime import datetime
 import json
+import os
 import sys
+import time as system_time
 
 import cv2
 import numpy as np
 import requests
 
-from view_transformer import view_transformer
 from detector import YOLOv8
+from view_transformer import view_transformer
 
 sys.path.append("/mqtt")
 from request_utils import *
@@ -146,7 +147,7 @@ def speed_estimation(camera, event_id, permitted_speed):
 
     if (max_detected_speed < permitted_speed):
         if os.path.isfile(filename):
-            time.sleep(1)
+            system_time.sleep(1)
             os.remove(filename)
     else:
         set_retain_to_true(event_id)
