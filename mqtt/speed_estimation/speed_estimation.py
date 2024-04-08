@@ -17,24 +17,6 @@ sys.path.append("/mqtt")
 from request_utils import *
 
 
-SOURCE = np.array([
-    [1252, 787],
-    [2298, 803],
-    [5039, 2159],
-    [-550, 2159]
-])
-
-TARGET_WIDTH = 25
-TARGET_HEIGHT = 250
-
-TARGET = np.array([
-    [0, 0],
-    [24, 0],
-    [24, 249],
-    [0, 249],
-])
-
-
 def speed_estimation(camera, event_id, permitted_speed):
     """
     Запуск модели
@@ -70,6 +52,8 @@ def speed_estimation(camera, event_id, permitted_speed):
     end_time = get_end_time(event_id)
 
     # For affine transforms
+    SOURCE, TARGET = get_transform_points(camera=camera)
+    print(f'get_transform_points {SOURCE} {TARGET}')
     coordinates = defaultdict(lambda: deque(maxlen=fps))
     transformer = view_transformer(source=SOURCE, target=TARGET)
 

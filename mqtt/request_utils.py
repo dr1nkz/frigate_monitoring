@@ -1,6 +1,7 @@
 import requests
 import json
 import yaml
+import numpy as np
 
 
 API_URL = 'http://frigate:5000/api/'
@@ -92,3 +93,28 @@ def get_end_time(event_id):
         end_time = None
 
     return end_time
+
+
+def get_transform_points(camera):
+    """
+    Get transform points for camera
+    """
+    try:
+        with open('speed_estimation/transform_points.json') as file:
+            transform_points = json.loads(file.read())
+
+        SOURCE = np.array(transform_points[camera]['SOURCE'])
+        TARGET_WIDTH = transform_points[camera]['TARGET_WIDTH']
+        TARGET_HEIGHT = transform_points[camera]['TARGET_HEIGHT']
+        TARGET = np.array([
+            [0, 0],
+            [TARGET_WIDTH - 1, 0],
+            [TARGET_WIDTH - 1, TARGET_HEIGHT - 1],
+            [0, TARGET_HEIGHT - 1],
+        ])
+    except:
+        print(f'No transform points for camera \'{camera}\'')
+        SOURCE = None
+        TARGET = None
+
+    return SOURCE, TARGET
