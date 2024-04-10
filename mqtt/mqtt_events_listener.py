@@ -12,8 +12,6 @@ from request_utils import set_retain_to_true, set_sub_label
 
 load_dotenv()
 CAMERAS = os.getenv('CAMERAS').split()
-LOGIN = os.getenv('LOGIN')
-PASSWORD = os.getenv('PASSWORD')
 ZONES = os.getenv('ZONES').split()
 LABELS = os.getenv('LABELS').split()
 DURATION = int(os.getenv('DURATION'))
