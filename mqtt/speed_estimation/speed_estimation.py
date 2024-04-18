@@ -17,13 +17,13 @@ sys.path.append("/mqtt")
 from request_utils import *
 
 
-def speed_estimation(camera, event_id, permitted_speed):
+def speed_estimation(camera: str, event_id: str, permitted_speed: int):
     """
     Speed estimation process
 
-    :camera: camera name
-    :event_id: id of the event
-    :permitted_speed: permitted speed to move
+    :camera: str - camera name
+    :event_id: str - id of the event
+    :permitted_speed: int - permitted speed to move
     """
     model_path = r'speed_estimation/human_forklift_helmet_vest.onnx'
     yolov8_detector = YOLOv8(path=model_path,
