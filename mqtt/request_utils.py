@@ -9,7 +9,9 @@ API_URL = 'http://frigate:5000/api/'
 
 def set_retain_to_true(id):
     """
-    Sets retain to true for the event with matches id
+    Set retain to true for the event with matches id
+
+    :id: id of the event
     """
     url = f'{API_URL}events/{id}/retain'
     # set star
@@ -22,7 +24,9 @@ def set_retain_to_true(id):
 
 def set_retain_to_false(id):
     """
-    Sets retain to false for the event with matches id
+    Set retain to false for the event with matches id
+
+    :id: id of the event
     """
     url = f'{API_URL}events/{id}/retain'
     # remove star
@@ -35,7 +39,10 @@ def set_retain_to_false(id):
 
 def set_sub_label(id, sublabel):
     """
-    Sets sublabel for the event with matches id
+    Set sublabel for the event with matches id
+
+    :id: id of the event
+    :sublabel: sublabel to set to the event
     """
     url = f'{API_URL}events/{id}/sub_label'
     data = {
@@ -51,7 +58,12 @@ def set_sub_label(id, sublabel):
 
 def get_camera_address(camera, login, password):
     """
-    Gets camera address for :camera:
+    Get camera address for :camera:
+
+    :camera: camera name
+    :login: login of the camera
+    :password: password of the camera
+    :return: camera address
     """
     url = f'{API_URL}config'
     response = requests.get(url=url).text
@@ -67,7 +79,10 @@ def get_camera_address(camera, login, password):
 
 def get_camera_address_from_config(camera):
     """
-    Gets camera address for :camera:
+    Get camera address of camera
+
+    :camera: camera name
+    :return: camera address
     """
     try:
         with open('/mqtt/config.yml', 'r') as file:
@@ -82,6 +97,9 @@ def get_camera_address_from_config(camera):
 def get_end_time(event_id):
     """
     Get end time of the event
+
+    :id: id of the event
+    :return: end time of the event
     """
     url = f'{API_URL}events/{event_id}'
     response = requests.get(url=url).text
@@ -98,6 +116,9 @@ def get_end_time(event_id):
 def get_transform_points(camera):
     """
     Get transform points for camera
+
+    :camera: camera name
+    :return: transform points for camera
     """
     try:
         with open('speed_estimation/transform_points.json') as file:

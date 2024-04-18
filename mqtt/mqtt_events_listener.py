@@ -22,6 +22,13 @@ processes = []
 
 
 def run_speed_estimation(camera, event_id, permitted_speed):
+    """
+    Invoke speed estimation process
+
+    :camera: camera name
+    :event_id: id of the event
+    :permitted_speed: permitted speed to move
+    """
     subprocess.call(['python3', f'speed_estimation/speed_estimation.py',
                      camera, event_id, f'{permitted_speed}'])
 

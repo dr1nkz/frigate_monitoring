@@ -19,7 +19,11 @@ from request_utils import *
 
 def speed_estimation(camera, event_id, permitted_speed):
     """
-    Запуск модели
+    Speed estimation process
+
+    :camera: camera name
+    :event_id: id of the event
+    :permitted_speed: permitted speed to move
     """
     model_path = r'speed_estimation/human_forklift_helmet_vest.onnx'
     yolov8_detector = YOLOv8(path=model_path,
@@ -66,7 +70,7 @@ def speed_estimation(camera, event_id, permitted_speed):
         if not ret:
             break
 
-        # Детектирование
+        # Detecting
         detected_img = frame.copy()
         bounding_boxes, scores, class_ids = yolov8_detector(detected_img)
         # print(bounding_boxes)
@@ -75,7 +79,7 @@ def speed_estimation(camera, event_id, permitted_speed):
         if detected_img is None:
             continue
 
-        # чтобы не ломалось iou
+        # iou fix if len == 1
         if len(bounding_boxes) == 1 or bounding_boxes.shape[0] == 1:
             # bounding_boxes = np.array([bounding_boxes])
             bounding_boxes = np.array(bounding_boxes).reshape(1, -1)
@@ -101,8 +105,9 @@ def speed_estimation(camera, event_id, permitted_speed):
                 speed = int(distance / time * 3.6)
 
                 max_detected_speed = speed if speed > max_detected_speed else max_detected_speed
-
-                caption = f'{int(speed)} km/h'  # надпись
+                
+                # Caption on the frame
+                caption = f'{int(speed)} km/h' # caption
                 font = cv2.FONT_HERSHEY_SIMPLEX  # font
                 fontScale = 1  # fontScale
                 thickness = 2  # Line thickness of 2 px
@@ -118,17 +123,17 @@ def speed_estimation(camera, event_id, permitted_speed):
         # if cv2.waitKey(1) & 0xFF == ord('q'):
         #     break
 
-        out.write(detected_img)  # frame
+        # Writing frame to file
+        out.write(detected_img) # frame
 
-        response = requests.get(
-            f'http://frigate:5000/api/events/{event_id}').text
-        response_json = json.loads(response)
-        end_time = response_json['end_time']
+        # Get end time of the event
+        end_time = get_end_time(event_id)
 
     # cv2.destroyAllWindows()
     cap.release()
     out.release()
 
+    # Postprocessing
     if (max_detected_speed < permitted_speed):
         if os.path.isfile(filename):
             system_time.sleep(1)
