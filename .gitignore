@@ -5,3 +5,4 @@ test.ipynb
 *.mp4
 mqtt/__pycache__
 mqtt/speed_estimation/__pycache__
+mqtt/tg_bot/__pycache__
