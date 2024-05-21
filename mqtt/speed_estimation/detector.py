@@ -144,13 +144,18 @@ class YOLOv8:
         Нанесение прямоугольников
         """
         classes = {
-            0: 'helmet',
-            1: 'no_helmet',
-            2: 'no_vest',
-            3: 'person',
-            4: 'vest',
-            5: 'forklift'
+            0: 'forklift',
+            1: 'person'
         }
+
+        # classes = {
+        #     0: 'helmet',
+        #     1: 'no_helmet',
+        #     2: 'no_vest',
+        #     3: 'person',
+        #     4: 'vest',
+        #     5: 'forklift'
+        # }
 
         # classes = {
         #     0: 'person',

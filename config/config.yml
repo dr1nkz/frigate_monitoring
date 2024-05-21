@@ -151,7 +151,7 @@ detectors:
       # path: /config/yolov8/yolov8n.xml
       # path: /config/hf/hf.xml
       # path: /config/helmets/helmets.xml
-      path: /config/human_forklift_helmet_vest/human_forklift_helmet_vest.xml
+      path: /config/forklift_human_new/forklift_human_new.xml
 
 model:
   width: 640
@@ -162,7 +162,7 @@ model:
   # labelmap_path: /config/yolov8/coco_80cl.txt
   # labelmap_path: /config/hf/hf_labelmap.txt
   # labelmap_path: /config/helmets/helmets_labelmap.txt
-  labelmap_path: /config/human_forklift_helmet_vest/human_forklift_helmet_vest_labelmap.txt
+  labelmap_path: /config/forklift_human_new/human_forklift_helmet_vest_labelmap.txt
 
 record:
   # Optional: Enable recording (default: shown below)

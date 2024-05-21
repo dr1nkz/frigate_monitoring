@@ -25,7 +25,7 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
     :event_id: str - id of the event
     :permitted_speed: int - permitted speed to move
     """
-    model_path = r'speed_estimation/human_forklift_helmet_vest.onnx'
+    model_path = r'speed_estimation/forklift_human_new.onnx'
     yolov8_detector = YOLOv8(path=model_path,
                              conf_thres=0.3,
                              iou_thres=0.5)
