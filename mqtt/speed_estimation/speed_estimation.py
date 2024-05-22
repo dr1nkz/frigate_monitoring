@@ -1,3 +1,4 @@
+from request_utils import *
 import argparse
 from collections import defaultdict, deque
 from datetime import datetime
@@ -14,7 +15,6 @@ from detector import YOLOv8
 from view_transformer import view_transformer
 
 sys.path.append("/mqtt")
-from request_utils import *
 
 
 def speed_estimation(camera: str, event_id: str, permitted_speed: int):
@@ -74,7 +74,7 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
         detected_img = frame.copy()
         bounding_boxes, scores, class_ids = yolov8_detector(detected_img)
         # print(bounding_boxes)
-        bounding_boxes = np.array(bounding_boxes)
+        bounding_boxes = np.array(bounding_boxes)[class_ids == 0]
         detected_img = yolov8_detector.draw_detections(detected_img)
         if detected_img is None:
             continue
@@ -105,9 +105,9 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
                 speed = int(distance / time * 3.6)
 
                 max_detected_speed = speed if speed > max_detected_speed else max_detected_speed
-                
+
                 # Caption on the frame
-                caption = f'{int(speed)} km/h' # caption
+                caption = f'{int(speed)} km/h'  # caption
                 font = cv2.FONT_HERSHEY_SIMPLEX  # font
                 fontScale = 1  # fontScale
                 thickness = 2  # Line thickness of 2 px
@@ -124,7 +124,7 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
         #     break
 
         # Writing frame to file
-        out.write(detected_img) # frame
+        out.write(detected_img)  # frame
 
         # Get end time of the event
         end_time = get_end_time(event_id)

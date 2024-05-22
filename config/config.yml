@@ -85,6 +85,9 @@ detect:
 objects:
   # Optional: list of objects to track from labelmap.txt (default: shown below)
   track:
+    - person
+    - forklift
+
     # - каска
     # - нет-каски
     # - нет-жилета
@@ -92,12 +95,12 @@ objects:
     # - жилет
     # - погрузчик
 
-    - helmet
-    - no_helmet
-    - no_vest
-    - person
-    - vest
-    - forklift
+    # - helmet
+    # - no_helmet
+    # - no_vest
+    # - person
+    # - vest
+    # - forklift
     
   filters:
     person:

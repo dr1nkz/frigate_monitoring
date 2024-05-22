@@ -1,6 +1,6 @@
-paths:
-    cam1:
-        source: rtsp://admin:admin@192.168.0.39:1935/video
+# paths:
+#     cam1:
+#         source: rtsp://admin:admin@192.168.0.39:1935/video
 
 # paths:
 #     cam1:
