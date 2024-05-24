@@ -1,4 +1,3 @@
-from request_utils import *
 import argparse
 from collections import defaultdict, deque
 from datetime import datetime
@@ -15,6 +14,7 @@ from detector import YOLOv8
 from view_transformer import view_transformer
 
 sys.path.append("/mqtt")
+from request_utils import *
 
 
 def speed_estimation(camera: str, event_id: str, permitted_speed: int):
@@ -25,7 +25,7 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
     :event_id: str - id of the event
     :permitted_speed: int - permitted speed to move
     """
-    model_path = r'speed_estimation/forklift_human_new.onnx'
+    model_path = r'speed_estimation/yolov9c.onnx'
     yolov8_detector = YOLOv8(path=model_path,
                              conf_thres=0.3,
                              iou_thres=0.5)
@@ -89,25 +89,30 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
                           for [x_1, _, x_2, y] in bounding_boxes])
         points = transformer.transform_points(points=points).astype(int)
 
-        # for class_id, [_, y] in zip(class_ids, points):
-        for class_id, [_, y] in enumerate(points):
-            coordinates[class_id].append(y)
+        for detection_id, point in enumerate(points):
+            coordinates[detection_id].append(point)
 
         # for class_id, bounding_box in zip(class_ids, bounding_boxes):
-        for class_id, bounding_box in enumerate(bounding_boxes):
+        for detection_id, bounding_box in enumerate(bounding_boxes):
             # wait to have enough data
-            if len(coordinates[class_id]) > fps / 2:
+            if len(coordinates[detection_id]) > fps / 2:
                 # calculate the speed
-                coordinate_start = coordinates[class_id][-1]
-                coordinate_end = coordinates[class_id][0]
-                distance = abs(coordinate_start - coordinate_end)
-                time = len(coordinates[class_id]) / fps
-                speed = int(distance / time * 3.6)
+                x_start = coordinates[detection_id][-1][0]
+                x_end = coordinates[detection_id][0][0]
+                y_start = coordinates[detection_id][-1][1]
+                y_end = coordinates[detection_id][0][1]
+                distance = np.sqrt((x_end - x_start)**2 +
+                                   (y_end - y_start)**2) / 10
+                # coordinate_start = coordinates[class_id][-1]
+                # coordinate_end = coordinates[class_id][0]
+                # distance = abs(coordinate_start - coordinate_end)
+                time = len(coordinates[detection_id]) / fps
+                speed = round(distance / time * 3.6, 2)
 
                 max_detected_speed = speed if speed > max_detected_speed else max_detected_speed
 
                 # Caption on the frame
-                caption = f'{int(speed)} km/h'  # caption
+                caption = f'{speed} km/h'  # caption
                 font = cv2.FONT_HERSHEY_SIMPLEX  # font
                 fontScale = 1  # fontScale
                 thickness = 2  # Line thickness of 2 px

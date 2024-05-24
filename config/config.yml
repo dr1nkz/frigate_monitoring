@@ -85,8 +85,8 @@ detect:
 objects:
   # Optional: list of objects to track from labelmap.txt (default: shown below)
   track:
-    - person
-    - forklift
+    # - person
+    - truck
 
     # - каска
     # - нет-каски
@@ -154,7 +154,8 @@ detectors:
       # path: /config/yolov8/yolov8n.xml
       # path: /config/hf/hf.xml
       # path: /config/helmets/helmets.xml
-      path: /config/forklift_human_new/forklift_human_new.xml
+      # path: /config/human_forklift_helmet_vest/human_forklift_helmet_vest.xml
+      path: /config/yolov9c/yolov9c.xml
 
 model:
   width: 640
@@ -165,7 +166,8 @@ model:
   # labelmap_path: /config/yolov8/coco_80cl.txt
   # labelmap_path: /config/hf/hf_labelmap.txt
   # labelmap_path: /config/helmets/helmets_labelmap.txt
-  labelmap_path: /config/forklift_human_new/human_forklift_helmet_vest_labelmap.txt
+  # labelmap_path: /config/human_forklift_helmet_vest/human_forklift_helmet_vest_labelmap.txt
+  labelmap_path: /config/yolov9c/yolov9c_labelmap.txt
 
 record:
   # Optional: Enable recording (default: shown below)
@@ -259,7 +261,7 @@ cameras:
       zone_1:
         coordinates: 0,480,341,480,347,0,0,0
         # Optional: Number of consecutive frames required for object to be considered present in the zone (default: shown below).
-        inertia: 50
+        inertia: 5
     # objects:
     #   filters:
     #     vest:
