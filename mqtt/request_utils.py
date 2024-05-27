@@ -125,8 +125,8 @@ def get_transform_points(camera: str):
             transform_points = json.loads(file.read())
 
         SOURCE = np.array(transform_points[camera]['SOURCE'])
-        TARGET_WIDTH = transform_points[camera]['TARGET_WIDTH']
-        TARGET_HEIGHT = transform_points[camera]['TARGET_HEIGHT']
+        TARGET_WIDTH = transform_points[camera]['TARGET_WIDTH'] * 10
+        TARGET_HEIGHT = transform_points[camera]['TARGET_HEIGHT'] * 10
         TARGET = np.array([
             [0, 0],
             [TARGET_WIDTH - 1, 0],
