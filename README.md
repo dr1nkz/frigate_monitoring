@@ -42,8 +42,8 @@ MAX_SPEED = 30 <br/><br/>
 ```json
 {
     "имя_камеры": {
-        "TARGET_WIDTH" : ширина в метрах * 10,
-        "TARGET_HEIGHT" : высота в метрах * 10,
+        "TARGET_WIDTH" : ширина в метрах,
+        "TARGET_HEIGHT" : высота в метрах,
         "SOURCE" : [
             [10, 10],
             [630, 10],
