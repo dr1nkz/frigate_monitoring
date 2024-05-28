@@ -74,7 +74,7 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
         detected_img = frame.copy()
         bounding_boxes, scores, class_ids = yolov8_detector(detected_img)
         # print(bounding_boxes)
-        bounding_boxes = np.array(bounding_boxes)[class_ids == 0]
+        bounding_boxes = np.array(bounding_boxes)[class_ids == 7]
         detected_img = yolov8_detector.draw_detections(detected_img)
         if detected_img is None:
             continue
