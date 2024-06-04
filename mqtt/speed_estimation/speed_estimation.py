@@ -1,16 +1,15 @@
 import argparse
 from collections import defaultdict, deque
 from datetime import datetime
-import json
 import os
 import sys
 import time as system_time
 
 import cv2
 import numpy as np
-import requests
+import supervision as sv
 
-from detector import YOLOv8
+from detector import YOLOv8, Detections
 from view_transformer import view_transformer
 
 sys.path.append("/mqtt")
@@ -61,6 +60,10 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
     coordinates = defaultdict(lambda: deque(maxlen=fps))
     transformer = view_transformer(source=SOURCE, target=TARGET)
 
+    # Byte tracker for id of the object
+    byte_track = sv.ByteTrack(frame_rate=fps,
+                              track_thresh=0.3)
+
     # Maximal detected speed
     max_detected_speed = 0
 
@@ -75,6 +78,8 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
         bounding_boxes, scores, class_ids = yolov8_detector(detected_img)
         # print(bounding_boxes)
         bounding_boxes = np.array(bounding_boxes)[class_ids == 7]
+        scores = np.array(scores)[class_ids == 2]
+        class_ids = np.array(class_ids)[class_ids == 2]
         detected_img = yolov8_detector.draw_detections(detected_img)
         if detected_img is None:
             continue
@@ -84,35 +89,38 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
             # bounding_boxes = np.array([bounding_boxes])
             bounding_boxes = np.array(bounding_boxes).reshape(1, -1)
 
+        # Byte tracker
+        detections = Detections(xyxy=bounding_boxes, confidence=scores,
+                                class_id=class_ids, tracker_id=None)
+        detections = byte_track.update_with_detections(detections=detections)
+
         # Bottom center anchors
         points = np.array([[x_1 + x_2 / 2, y]
-                          for [x_1, _, x_2, y] in bounding_boxes])
+                          for [x_1, _, x_2, y] in detections.xyxy])
         points = transformer.transform_points(points=points).astype(int)
 
-        for detection_id, point in enumerate(points):
-            coordinates[detection_id].append(point)
+        for tracker_id, point in zip(detections.tracker_id, points):
+            coordinates[tracker_id].append(point)
 
         # for class_id, bounding_box in zip(class_ids, bounding_boxes):
-        for detection_id, bounding_box in enumerate(bounding_boxes):
+        for tracker_id, bounding_box in zip(detections.tracker_id, bounding_boxes):
             # wait to have enough data
-            if len(coordinates[detection_id]) > fps / 2:
+            if len(coordinates[tracker_id]) > fps / 2:
                 # calculate the speed
-                x_start = coordinates[detection_id][-1][0]
-                x_end = coordinates[detection_id][0][0]
-                y_start = coordinates[detection_id][-1][1]
-                y_end = coordinates[detection_id][0][1]
+                x_start = coordinates[tracker_id][-1][0]
+                x_end = coordinates[tracker_id][0][0]
+                y_start = coordinates[tracker_id][-1][1]
+                y_end = coordinates[tracker_id][0][1]
                 distance = np.sqrt((x_end - x_start)**2 +
                                    (y_end - y_start)**2) / 10
-                # coordinate_start = coordinates[class_id][-1]
-                # coordinate_end = coordinates[class_id][0]
-                # distance = abs(coordinate_start - coordinate_end)
-                time = len(coordinates[detection_id]) / fps
+
+                time = len(coordinates[tracker_id]) / fps
                 speed = round(distance / time * 3.6, 2)
 
                 max_detected_speed = speed if speed > max_detected_speed else max_detected_speed
 
                 # Caption on the frame
-                caption = f'{speed} km/h'  # caption
+                caption = f'#{tracker_id} {speed} km/h'  # caption
                 font = cv2.FONT_HERSHEY_SIMPLEX  # font
                 fontScale = 1  # fontScale
                 thickness = 2  # Line thickness of 2 px

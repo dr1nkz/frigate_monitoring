@@ -2,9 +2,25 @@ import time
 import cv2
 import numpy as np
 import onnxruntime
+from dataclasses import dataclass
 
 
 from utils import xywh2xyxy, nms, compute_iou
+
+
+@dataclass
+class Detections:
+    xyxy: np.ndarray
+    confidence: np.ndarray
+    class_id: np.ndarray
+    tracker_id: np.ndarray
+
+    def __len__(self):
+        return len(self.class_id)
+
+    def __getitem__(self, index):
+        return Detections(xyxy=self.xyxy, confidence=self.confidence,
+                          class_id=self.class_id, tracker_id=self.tracker_id)
 
 
 class YOLOv8:

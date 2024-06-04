@@ -6,3 +6,4 @@ numpy
 onnxruntime-gpu==1.15.1
 pyyaml
 shapely
+supervision
