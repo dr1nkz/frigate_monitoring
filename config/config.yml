@@ -249,7 +249,7 @@ cameras:
         #   roles:
         #     - record
 
-        - path: rtsp://mediamtx-server:8554/stream0.sdp
+        - path: rtsp://192.168.11.2:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
           # input_args: preset-rtsp-restream
           roles:
             - record
