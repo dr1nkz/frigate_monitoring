@@ -37,9 +37,9 @@ mqtt:
 
 detect:
   # Optional: width of the frame for the input with the detect role (default: use native stream resolution)
-  width: 720
+  width: 1920
   # Optional: height of the frame for the input with the detect role (default: use native stream resolution)
-  height: 480
+  height: 1080
   # Optional: desired fps for your camera for the input with the detect role (default: shown below)
   # NOTE: Recommended value of 5. Ideally, try and reduce your FPS on the camera.
   fps: 5
