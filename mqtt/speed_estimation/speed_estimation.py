@@ -78,8 +78,8 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
         bounding_boxes, scores, class_ids = yolov8_detector(detected_img)
         # print(bounding_boxes)
         bounding_boxes = np.array(bounding_boxes)[class_ids == 7]
-        scores = np.array(scores)[class_ids == 2]
-        class_ids = np.array(class_ids)[class_ids == 2]
+        scores = np.array(scores)[class_ids == 7]
+        class_ids = np.array(class_ids)[class_ids == 7]
         detected_img = yolov8_detector.draw_detections(detected_img)
         if detected_img is None:
             continue
@@ -91,8 +91,9 @@ def speed_estimation(camera: str, event_id: str, permitted_speed: int):
 
         # Byte tracker
         detections = Detections(xyxy=bounding_boxes, confidence=scores,
-                                class_id=class_ids, tracker_id=None)
-        detections = byte_track.update_with_detections(detections=detections)
+                                        class_id=class_ids, tracker_id=[None] * len(bounding_boxes))
+        if len(detections.xyxy) != 0:
+            detections = byte_track.update_with_detections(detections=detections)
 
         # Bottom center anchors
         points = np.array([[x_1 + x_2 / 2, y]
