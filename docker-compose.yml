@@ -43,13 +43,13 @@ services:
       - "1984:1984"
       # - "8555:8555/tcp" # WebRTC over tcp
       # - "8555:8555/udp" # WebRTC over udp
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [ gpu ]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
 
   mqtt_events_listener:
     container_name: mqtt_events_listener
@@ -61,13 +61,13 @@ services:
       - ./config/config.yml:/mqtt/config.yml
       - /etc/localtime:/etc/localtime
       - ./storage/speed_estimation:/storage
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [ gpu ]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
 
   mediamtx:
     platform: linux/amd64
