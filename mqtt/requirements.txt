@@ -3,7 +3,8 @@ paho-mqtt==2.0.0
 requests
 opencv-python
 numpy
-onnxruntime-gpu==1.15.1
+torch
+onnxruntime-gpu==1.18.0
 pyyaml
 shapely
 supervision
