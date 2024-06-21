@@ -3,7 +3,7 @@ python-dotenv
 paho-mqtt==2.0.0
 requests
 opencv-python
-# torch
+torch
 --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/
 onnxruntime-gpu==1.18.0
 pyyaml
