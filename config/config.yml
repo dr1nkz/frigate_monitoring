@@ -155,7 +155,8 @@ detectors:
       # path: /config/hf/hf.xml
       # path: /config/helmets/helmets.xml
       # path: /config/human_forklift_helmet_vest/human_forklift_helmet_vest.xml
-      path: /config/yolov9c/yolov9c.xml
+      # path: /config/yolov9c/yolov9c.xml
+      path: /config/clips_model/clips_model.xml
 
 model:
   width: 640
@@ -167,7 +168,8 @@ model:
   # labelmap_path: /config/hf/hf_labelmap.txt
   # labelmap_path: /config/helmets/helmets_labelmap.txt
   # labelmap_path: /config/human_forklift_helmet_vest/human_forklift_helmet_vest_labelmap.txt
-  labelmap_path: /config/yolov9c/yolov9c_labelmap.txt
+  # labelmap_path: /config/yolov9c/yolov9c_labelmap.txt
+  labelmap_path: /config/clips_model/clips_model_labelmap.txt
 
 record:
   # Optional: Enable recording (default: shown below)
@@ -235,18 +237,13 @@ cameras:
     enabled: true
 
     ffmpeg:
-      # hwaccel_args: preset-nvidia-h264
+      hwaccel_args: preset-nvidia-h264
       inputs:
         # - path: rtsp://admin:admin@192.168.0.39:1935
         # # - path: http://192.168.0.39:8080/video
         # #   input_args: -re -stream_loop -1 -fflags +genpts
         #   roles:
         #     - detect
-          
-        # - path: rtsp://admin:admin@192.168.0.39:1935
-        # # - path: http://192.168.0.39:8080/video
-        # #   input_args: -re -stream_loop -1 -fflags +genpts
-        #   roles:
         #     - record
 
         - path: rtsp://192.168.11.2:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
@@ -263,14 +260,14 @@ cameras:
         coordinates: 0,480,341,480,347,0,0,0
         # Optional: Number of consecutive frames required for object to be considered present in the zone (default: shown below).
         inertia: 5
-    # objects:
-    #   filters:
-    #     vest:
-    #       mask:
-    #       - 0,480,341,480,347,0,0,0
-    #     helmet:
-    #       mask:
-    #       - 0,480,341,480,347,0,0,0
-    #     person:
-    #       mask:
-    #       - 0,480,341,480,347,0,0,0
+
+  test2:
+    enabled: true
+
+    ffmpeg:
+      hwaccel_args: preset-nvidia-h264
+      inputs:
+        - path: rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
+          roles:
+            - record
+            - detect
