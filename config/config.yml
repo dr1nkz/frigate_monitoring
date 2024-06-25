@@ -265,7 +265,7 @@ cameras:
     enabled: true
 
     ffmpeg:
-      hwaccel_args: preset-nvidia-h264
+      # hwaccel_args: preset-nvidia-h264
       inputs:
         - path: rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
           roles:
