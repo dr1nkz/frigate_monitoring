@@ -86,7 +86,7 @@ objects:
   # Optional: list of objects to track from labelmap.txt (default: shown below)
   track:
     # - person
-    - truck
+    - forklift
 
     # - каска
     # - нет-каски
