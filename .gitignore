@@ -6,3 +6,8 @@ test.ipynb
 mqtt/__pycache__
 mqtt/speed_estimation/__pycache__
 mqtt/tg_bot/__pycache__
+config/frigate.db
+config/.timeline
+config/.vacuum
+config/frigate.db-shm
+config/frigate.db-wal
