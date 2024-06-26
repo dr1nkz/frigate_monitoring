@@ -11,150 +11,164 @@ import supervision as sv
 
 from detector import YOLOv8, Detections
 from view_transformer import view_transformer
+from request_utils import (
+    get_camera_address_from_config,
+    get_end_time,
+    set_retain_to_true,
+    set_sub_label,
+    get_transform_points
+)
 
-sys.path.append("/mqtt")
-from request_utils import *
 
-
-def speed_estimation(camera: str, event_id: str, permitted_speed: int):
+class SpeedEstimator:
     """
-    Speed estimation process
-
-    :camera: str - camera name
-    :event_id: str - id of the event
-    :permitted_speed: int - permitted speed to move
+    Class for speed estimation of bojects
     """
-    model_path = r'speed_estimation/clips_model.onnx'
-    yolov8_detector = YOLOv8(path=model_path,
+    def __init__(self, model_path):
+        self.yolov8_detector = YOLOv8(path=model_path,
                              conf_thres=0.3,
                              iou_thres=0.5)
 
-    # Get camera address
-    # address = f'rtsp://localhost:8554/{camera}'
-    # address = get_camera_address(camera, login, password)
-    address = get_camera_address_from_config(camera)
+    def __call__(self, camera: str, event_id: str, permitted_speed: int):
+        self.speed_estimation(camera, event_id, permitted_speed)
 
-    # Videocapturing
-    # cv2.namedWindow('stream', cv2.WINDOW_NORMAL)
-    cap = cv2.VideoCapture(address)
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
 
-    # Videowriting
-    directory = '/storage/' + datetime.now().strftime(r'%d.%m.%Y/')
-    if not os.path.isdir(directory):
-        os.mkdir(directory)
-    filename = directory + camera + \
-        datetime.now().strftime(r'_%H:%M:%S_') + event_id + '.mp4'
-    out = cv2.VideoWriter(filename, fourcc, fps, (width, height))
-    print(filename)
+    def speed_estimation(self, camera: str, event_id: str, permitted_speed: int):
+        """
+        Speed estimation process
 
-    # Get end time of the event
-    end_time = get_end_time(event_id)
+        :camera: str - camera name
+        :event_id: str - id of the event
+        :permitted_speed: int - permitted speed to move
+        """
 
-    # For affine transforms
-    SOURCE, TARGET = get_transform_points(camera=camera)
-    print(f'get_transform_points {SOURCE} {TARGET}')
-    coordinates = defaultdict(lambda: deque(maxlen=fps))
-    transformer = view_transformer(source=SOURCE, target=TARGET)
+        # Get camera address
+        # address = f'rtsp://localhost:8554/{camera}'
+        # address = get_camera_address(camera, login, password)
+        address = get_camera_address_from_config(camera)
 
-    # Byte tracker for id of the object
-    byte_track = sv.ByteTrack(frame_rate=fps,
-                              track_thresh=0.3)
+        # Videocapturing
+        # cv2.namedWindow('stream', cv2.WINDOW_NORMAL)
+        cap = cv2.VideoCapture(address)
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = int(cap.get(cv2.CAP_PROP_FPS))
 
-    # Maximal detected speed
-    max_detected_speed = 0
-
-    while cap.isOpened() and end_time is None:
-        # Кадр с камеры
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        # Detecting
-        detected_img = frame.copy()
-        bounding_boxes, scores, class_ids = yolov8_detector(detected_img)
-        # print(bounding_boxes)
-        bounding_boxes = np.array(bounding_boxes)[class_ids == 0]
-        scores = np.array(scores)[class_ids == 0]
-        class_ids = np.array(class_ids)[class_ids == 0]
-        detected_img = yolov8_detector.draw_detections(detected_img)
-        if detected_img is None:
-            continue
-
-        # iou fix if len == 1
-        if len(bounding_boxes) == 1 or bounding_boxes.shape[0] == 1:
-            # bounding_boxes = np.array([bounding_boxes])
-            bounding_boxes = np.array(bounding_boxes).reshape(1, -1)
-
-        # Byte tracker
-        detections = Detections(xyxy=bounding_boxes, confidence=scores,
-                                        class_id=class_ids, tracker_id=[None] * len(bounding_boxes))
-        if len(detections.xyxy) != 0:
-            detections = byte_track.update_with_detections(detections=detections)
-
-        # Bottom center anchors
-        points = np.array([[x_1 + x_2 / 2, y]
-                          for [x_1, _, x_2, y] in detections.xyxy])
-        points = transformer.transform_points(points=points).astype(int)
-
-        for tracker_id, point in zip(detections.tracker_id, points):
-            coordinates[tracker_id].append(point)
-
-        # for class_id, bounding_box in zip(class_ids, bounding_boxes):
-        for tracker_id, bounding_box in zip(detections.tracker_id, bounding_boxes):
-            # wait to have enough data
-            if len(coordinates[tracker_id]) > fps / 2:
-                # calculate the speed
-                x_start = coordinates[tracker_id][-1][0]
-                x_end = coordinates[tracker_id][0][0]
-                y_start = coordinates[tracker_id][-1][1]
-                y_end = coordinates[tracker_id][0][1]
-                distance = np.sqrt((x_end - x_start)**2 +
-                                   (y_end - y_start)**2) / 10
-
-                time = len(coordinates[tracker_id]) / fps
-                speed = round(distance / time * 3.6, 2)
-
-                max_detected_speed = speed if speed > max_detected_speed else max_detected_speed
-
-                # Caption on the frame
-                caption = f'#{tracker_id} {speed} km/h'  # caption
-                font = cv2.FONT_HERSHEY_SIMPLEX  # font
-                fontScale = 1  # fontScale
-                thickness = 2  # Line thickness of 2 px
-                x_1 = bounding_box[0]
-                y_1 = bounding_box[1]
-                x_2 = bounding_box[2]
-                y_2 = bounding_box[3]
-                # Using cv2.putText() method
-                cv2.putText(detected_img, caption, (int(x_1 + 2), int(y_1 + (y_2 - y_1) / 2)),
-                            font, fontScale, (255, 0, 0), thickness, cv2.LINE_AA)
-
-        # cv2.imshow('stream', detected_img)
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     break
-
-        # Writing frame to file
-        out.write(detected_img)  # frame
+        # Videowriting
+        directory = '/storage/' + datetime.now().strftime(r'%d.%m.%Y/')
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
+        filename = directory + camera + \
+            datetime.now().strftime(r'_%H:%M:%S_') + event_id + '.mp4'
+        out = cv2.VideoWriter(filename, fourcc, fps, (width, height))
+        print(filename)
 
         # Get end time of the event
         end_time = get_end_time(event_id)
 
-    # cv2.destroyAllWindows()
-    cap.release()
-    out.release()
+        # For affine transforms
+        SOURCE, TARGET = get_transform_points(camera=camera)
+        print(f'get_transform_points {SOURCE} {TARGET}')
+        coordinates = defaultdict(lambda: deque(maxlen=fps))
+        transformer = view_transformer(source=SOURCE, target=TARGET)
 
-    # Postprocessing
-    if (max_detected_speed < permitted_speed):
-        if os.path.isfile(filename):
-            system_time.sleep(1)
-            os.remove(filename)
-    else:
-        set_retain_to_true(event_id)
-        set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
+        # Byte tracker for id of the object
+        byte_track = sv.ByteTrack(frame_rate=fps,
+                                track_thresh=0.3)
+
+        # Maximal detected speed
+        max_detected_speed = 0
+
+        while cap.isOpened() and end_time is None:
+            # Кадр с камеры
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            # Detecting
+            detected_img = frame.copy()
+            bounding_boxes, scores, class_ids = self.yolov8_detector(detected_img)
+            # print(bounding_boxes)
+            bounding_boxes = np.array(bounding_boxes)[class_ids == 0]
+            scores = np.array(scores)[class_ids == 0]
+            class_ids = np.array(class_ids)[class_ids == 0]
+            detected_img = self.yolov8_detector.draw_detections(detected_img)
+            if detected_img is None:
+                continue
+
+            # iou fix if len == 1
+            if len(bounding_boxes) == 1 or bounding_boxes.shape[0] == 1:
+                # bounding_boxes = np.array([bounding_boxes])
+                bounding_boxes = np.array(bounding_boxes).reshape(1, -1)
+
+            # Byte tracker
+            detections = Detections(xyxy=bounding_boxes, confidence=scores,
+                                            class_id=class_ids, tracker_id=[None] * len(bounding_boxes))
+            if len(detections.xyxy) != 0:
+                detections = byte_track.update_with_detections(detections=detections)
+
+            # Bottom center anchors
+            points = np.array([[x_1 + x_2 / 2, y]
+                            for [x_1, _, x_2, y] in detections.xyxy])
+            points = transformer.transform_points(points=points).astype(int)
+
+            for tracker_id, point in zip(detections.tracker_id, points):
+                coordinates[tracker_id].append(point)
+
+            # for class_id, bounding_box in zip(class_ids, bounding_boxes):
+            for tracker_id, bounding_box in zip(detections.tracker_id, bounding_boxes):
+                # wait to have enough data
+                if len(coordinates[tracker_id]) > fps / 2:
+                    # calculate the speed
+                    x_start = coordinates[tracker_id][-1][0]
+                    x_end = coordinates[tracker_id][0][0]
+                    y_start = coordinates[tracker_id][-1][1]
+                    y_end = coordinates[tracker_id][0][1]
+                    distance = np.sqrt((x_end - x_start)**2 +
+                                    (y_end - y_start)**2) / 10
+
+                    time = len(coordinates[tracker_id]) / fps
+                    speed = round(distance / time * 3.6, 2)
+
+                    max_detected_speed = speed if speed > max_detected_speed else max_detected_speed
+
+                    # Caption on the frame
+                    caption = f'#{tracker_id} {speed} km/h'  # caption
+                    font = cv2.FONT_HERSHEY_SIMPLEX  # font
+                    fontScale = 1  # fontScale
+                    thickness = 2  # Line thickness of 2 px
+                    x_1 = bounding_box[0]
+                    y_1 = bounding_box[1]
+                    x_2 = bounding_box[2]
+                    y_2 = bounding_box[3]
+                    # Using cv2.putText() method
+                    cv2.putText(detected_img, caption, (int(x_1 + 2), int(y_1 + (y_2 - y_1) / 2)),
+                                font, fontScale, (255, 0, 0), thickness, cv2.LINE_AA)
+
+            # cv2.imshow('stream', detected_img)
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     break
+
+            # Writing frame to file
+            out.write(detected_img)  # frame
+
+            # Get end time of the event
+            end_time = get_end_time(event_id)
+
+        # cv2.destroyAllWindows()
+        cap.release()
+        out.release()
+
+        # Postprocessing
+        if (max_detected_speed < permitted_speed):
+            pass
+            # if os.path.isfile(filename):
+            #     system_time.sleep(1)
+            #     os.remove(filename)
+        else:
+            set_retain_to_true(event_id)
+            set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
 
 
 if __name__ == '__main__':
@@ -168,4 +182,5 @@ if __name__ == '__main__':
     event_id = args.event_id
     permitted_speed = int(args.permitted_speed)
 
-    speed_estimation(camera, event_id, permitted_speed)
+    speed_estimator = SpeedEstimator(r'speed_estimation/clips_model.onnx')
+    speed_estimator(camera, event_id, permitted_speed)
