@@ -56,7 +56,7 @@ services:
     restart: unless-stopped
     build: ./mqtt
     environment:
-      - PYTHONPATH="${PYTHONPATH}:/home/pc/frigate_test/mqtt/speed_estimation"
+      - PYTHONPATH="/home/pc/frigate_test/mqtt/speed_estimation"
     command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
     volumes:
       - ./mqtt:/mqtt
