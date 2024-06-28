@@ -1,4 +1,4 @@
-# import torch
+import torch
 import onnxruntime
 
 print(onnxruntime.get_available_providers())

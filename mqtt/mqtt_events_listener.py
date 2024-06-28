@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import paho.mqtt.client as mqtt
 
 from request_utils import set_retain_to_true, set_sub_label
-from speed_estimation import SpeedEstimator
+# from speed_estimation import SpeedEstimator
 
 load_dotenv()
 CAMERAS = os.getenv('CAMERAS').split()
@@ -19,7 +19,7 @@ MAX_SPEED = int(os.getenv('MAX_SPEED'))
 
 event_ids = []
 processes = []
-speed_estimator = SpeedEstimator(r'speed_estimation/clips_model.onnx')
+# speed_estimator = SpeedEstimator(r'speed_estimation/clips_model.onnx')
 
 
 def run_speed_estimation(camera: str, event_id: str, permitted_speed: int):
@@ -30,9 +30,9 @@ def run_speed_estimation(camera: str, event_id: str, permitted_speed: int):
     :event_id: str - id of the event
     :permitted_speed: int - permitted speed to move
     """
-    # subprocess.call(['python3', f'speed_estimation/speed_estimation.py',
-    #                  camera, event_id, f'{permitted_speed}'])
-    speed_estimator(camera, event_id, permitted_speed)
+    subprocess.call(['python3', f'speed_estimation/speed_estimation.py',
+                     camera, event_id, f'{permitted_speed}'])
+    # speed_estimator(camera, event_id, permitted_speed)
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
