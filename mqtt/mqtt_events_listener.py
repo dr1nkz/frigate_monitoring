@@ -19,7 +19,6 @@ MAX_SPEED = int(os.getenv('MAX_SPEED'))
 
 event_ids = []
 processes = []
-multiprocessing.set_start_method('spawn')
 speed_estimator = SpeedEstimator(r'speed_estimation/clips_model.onnx')
 
 
@@ -102,14 +101,17 @@ def on_message(client, userdata, msg):
             del processes[i]
 
 
-mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-mqttc.on_connect = on_connect
-mqttc.on_message = on_message
+if __name__ == '__main__':
+    multiprocessing.set_start_method('spawn')
 
-mqttc.connect("nanomq", 1883, 60)
+    mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    mqttc.on_connect = on_connect
+    mqttc.on_message = on_message
 
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-mqttc.loop_forever()
+    mqttc.connect("nanomq", 1883, 60)
+
+    # Blocking call that processes network traffic, dispatches callbacks and
+    # handles reconnecting.
+    # Other loop*() functions are available that give a threaded interface and a
+    # manual interface.
+    mqttc.loop_forever()
