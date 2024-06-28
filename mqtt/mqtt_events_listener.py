@@ -19,6 +19,7 @@ MAX_SPEED = int(os.getenv('MAX_SPEED'))
 
 event_ids = []
 processes = []
+multiprocessing.set_start_method('spawn')
 speed_estimator = SpeedEstimator(r'speed_estimation/clips_model.onnx')
 
 
