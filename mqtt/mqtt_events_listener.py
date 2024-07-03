@@ -16,10 +16,11 @@ ZONES = os.getenv('ZONES').split()
 LABELS = os.getenv('LABELS').split()
 DURATION = int(os.getenv('DURATION'))
 MAX_SPEED = int(os.getenv('MAX_SPEED'))
+MODEL = os.getenv('MODEL')
 
 event_ids = []
 processes = []
-speed_estimator = SpeedEstimator(r'speed_estimation/clips_model.onnx')
+speed_estimator = SpeedEstimator(MODEL)
 
 
 def run_speed_estimation(camera: str, event_id: str, permitted_speed: int):
