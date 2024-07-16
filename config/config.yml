@@ -173,7 +173,7 @@ model:
   # labelmap_path: /config/yolov9c/yolov9c_labelmap.txt
   # labelmap_path: /config/clips_model/clips_model_labelmap.txt
   # labelmap_path: /config/clips_model_v2/clips_model_v2_labelmap.txt
-  labelmap_path: /config/clips_model_v2/clips_model_9s_labelmap.txt
+  labelmap_path: /config/clips_model_9s/clips_model_9s_labelmap.txt
 
 record:
   # Optional: Enable recording (default: shown below)
