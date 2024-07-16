@@ -157,7 +157,8 @@ detectors:
       # path: /config/human_forklift_helmet_vest/human_forklift_helmet_vest.xml
       # path: /config/yolov9c/yolov9c.xml
       # path: /config/clips_model/clips_model.xml
-      path: /config/clips_model_v2/clips_model_v2.xml
+      # path: /config/clips_model_v2/clips_model_v2.xml
+      path: /config/clips_model_9s/clips_model_9s.xml
 
 model:
   width: 640
@@ -171,7 +172,8 @@ model:
   # labelmap_path: /config/human_forklift_helmet_vest/human_forklift_helmet_vest_labelmap.txt
   # labelmap_path: /config/yolov9c/yolov9c_labelmap.txt
   # labelmap_path: /config/clips_model/clips_model_labelmap.txt
-  labelmap_path: /config/clips_model_v2/clips_model_v2_labelmap.txt
+  # labelmap_path: /config/clips_model_v2/clips_model_v2_labelmap.txt
+  labelmap_path: /config/clips_model_v2/clips_model_9s_labelmap.txt
 
 record:
   # Optional: Enable recording (default: shown below)
