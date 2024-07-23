@@ -258,9 +258,7 @@ cameras:
             - detect
 
     zones:
-      # zone_0:
-      #   coordinates: 689,203,684,79,544,62
-      zone_1:
+      zone_0:
         coordinates: 0,480,341,480,347,0,0,0
         # Optional: Number of consecutive frames required for object to be considered present in the zone (default: shown below).
         inertia: 5

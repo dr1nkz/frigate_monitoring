@@ -16,7 +16,7 @@ from request_utils import (
     get_end_time,
     set_retain_to_true,
     set_sub_label,
-    get_transform_points
+    get_transform_points_from_config
 )
 
 
@@ -68,7 +68,7 @@ class SpeedEstimator:
         end_time = get_end_time(event_id)
 
         # For affine transforms
-        SOURCE, TARGET = get_transform_points(camera=camera)
+        SOURCE, TARGET = get_transform_points_from_config(camera=camera)
         print(f'get_transform_points {SOURCE} {TARGET}')
         coordinates = defaultdict(lambda: deque(maxlen=fps))
         transformer = view_transformer(source=SOURCE, target=TARGET)

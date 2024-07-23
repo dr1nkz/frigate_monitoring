@@ -139,3 +139,62 @@ def get_transform_points(camera: str):
         TARGET = None
 
     return SOURCE, TARGET
+
+
+def get_transform_points_from_config(camera: str):
+    """
+    Get transform points for camera
+
+    :camera: str - camera name
+    :return: np.array(int) - transform points for camera
+    """
+    try:
+        url = f'{API_URL}config'
+        response = requests.get(url=url).text
+        response = json.loads(response)
+        source = response["cameras"][camera]['zones']['zone_0']['coordinates']
+
+        source = [int(number) for number in source.split(',')]
+        source = np.array(source).reshape(-1, 2).tolist()
+        source = sort_rectangle_points(source)
+
+        with open('speed_estimation/transform_points.json') as file:
+            transform_points = json.loads(file.read())
+        target_width = transform_points[camera]['TARGET_WIDTH'] * 10
+        target_height = transform_points[camera]['TARGET_HEIGHT'] * 10
+        target = np.array([
+            [0, 0],
+            [target_width - 1, 0],
+            [target_width - 1, target_height - 1],
+            [0, target_height - 1],
+        ])
+    except:
+        print(f'No transform points for camera \'{camera}\'')
+        source = None
+        target = None
+
+    return source, target
+
+
+def sort_rectangle_points(points):
+    # Убедимся, что мы получили именно 4 точки
+    if len(points) != 4:
+        raise ValueError("Необходимо предоставить ровно 4 точки.")
+
+    # Сначала находим верхнюю левую точку
+    top_left = min(points, key=lambda p: (p[0], p[1]))
+    points.remove(top_left)
+
+    # Теперь у нас остались 3 точки. Определим их
+    # По часовой стрелке от верхней левой точки
+    # Относительно верхней левой точки
+    def angle_from_top_left(point):
+        # Считаем угол относительно линии, проведенной через верхнюю левую точку
+        x, y = point[0] - top_left[0], point[1] - top_left[1]
+        return (y, -x)  # Поменяли знак на x, так как в системе координат y вниз
+
+    # Сортируем оставшиеся точки по углу
+    sorted_points = sorted(points, key=angle_from_top_left)
+
+    # Возвращаем список, начинающийся с верхней левой точки
+    return [top_left] + sorted_points

@@ -1,12 +1,6 @@
 {
     "test": {
-        "TARGET_WIDTH" : 3,
-        "TARGET_HEIGHT" : 30,
-        "SOURCE" : [
-            [72, 172],
-            [115, 153],
-            [712, 800],
-            [295, 978]
-        ]
+        "TARGET_WIDTH": 3,
+        "TARGET_HEIGHT": 30
     }
 }
