@@ -263,13 +263,13 @@ cameras:
         # Optional: Number of consecutive frames required for object to be considered present in the zone (default: shown below).
         inertia: 5
 
-  # test2:
-  #   enabled: true
+  test2:
+    enabled: true
 
-  #   ffmpeg:
-  #     hwaccel_args: preset-nvidia-h264
-  #     inputs:
-  #       - path: rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
-  #         roles:
-  #           - record
-  #           - detect
+    ffmpeg:
+      hwaccel_args: preset-nvidia-h264
+      inputs:
+        - path: rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
+          roles:
+            - record
+            - detect

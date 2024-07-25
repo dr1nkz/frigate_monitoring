@@ -79,7 +79,7 @@ def get_camera_address(camera: str, login: str, password: str):
 
 def get_camera_address_from_config(camera: str):
     """
-    Get camera address of camera
+    Get address of camera
 
     :camera: str - camera name
     :return: str - camera address
@@ -92,6 +92,22 @@ def get_camera_address_from_config(camera: str):
         address = None
 
     return address
+
+
+def get_cameras_names_from_config():
+    """
+    Get names of cameras
+
+    :return: names - camera names
+    """
+    try:
+        with open('/mqtt/config.yml', 'r') as file:
+            config = yaml.safe_load(file)
+        names = tuple(config['cameras'].keys())
+    except:
+        names = None
+
+    return names
 
 
 def get_end_time(event_id: str):
