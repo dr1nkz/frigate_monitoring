@@ -29,17 +29,18 @@ class SpeedEstimator:
                              conf_thres=0.3,
                              iou_thres=0.5)
 
-    def __call__(self, camera: str, event_id: str, permitted_speed: int):
-        self.speed_estimation(camera, event_id, permitted_speed)
+    def __call__(self, camera: str, event_id: str, permitted_speed: int, cap: cv2.VideoCapture):
+        self.speed_estimation(camera, event_id, permitted_speed, cap)
 
 
-    def speed_estimation(self, camera: str, event_id: str, permitted_speed: int):
+    def speed_estimation(self, camera: str, event_id: str, permitted_speed: int, cap: cv2.VideoCapture):
         """
         Speed estimation process
 
         :camera: str - camera name
         :event_id: str - id of the event
         :permitted_speed: int - permitted speed to move
+        :cap: cv2.VideoCapture - 
         """
 
         # Get camera address
@@ -49,7 +50,7 @@ class SpeedEstimator:
 
         # Videocapturing
         # cv2.namedWindow('stream', cv2.WINDOW_NORMAL)
-        cap = cv2.VideoCapture(address)
+        # cap = cv2.VideoCapture(address)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))

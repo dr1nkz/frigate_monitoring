@@ -1,13 +1,21 @@
 import json
 import os
-import requests
+import time
 import subprocess
 import multiprocessing
 
+import cv2
+import schedule
 from dotenv import load_dotenv
 import paho.mqtt.client as mqtt
+import requests
 
-from request_utils import set_retain_to_true, set_sub_label
+from request_utils import (
+    set_retain_to_true,
+    set_sub_label,
+    get_camera_address_from_config,
+    get_cameras_names_from_config
+)
 from speed_estimation import SpeedEstimator
 
 load_dotenv()
@@ -21,6 +29,13 @@ MODEL = os.getenv('MODEL')
 event_ids = []
 processes = []
 speed_estimator = SpeedEstimator(MODEL)
+
+# caps for cameras
+camera_names = get_cameras_names_from_config()
+camera_addresses = [get_camera_address_from_config(camera_name) for camera_name in camera_names]
+caps = {camera_name : cv2.VideoCapture(camera_address)
+        for camera_name, camera_address in zip(camera_names, camera_addresses)}
+print(caps)
 
 
 def run_speed_estimation(camera: str, event_id: str, permitted_speed: int):
@@ -38,7 +53,7 @@ def run_speed_estimation(camera: str, event_id: str, permitted_speed: int):
 
 def on_connect(client, userdata, flags, reason_code, properties):
     """
-    # The callback for when the client receives a CONNACK response from the server.
+    The callback for when the client receives a CONNACK response from the server.
     """
     print(f"Connected with result code {reason_code}")
     # Subscribing in on_connect()
@@ -77,7 +92,7 @@ def on_message(client, userdata, msg):
         if (end_time is None) and not (event_id in event_ids):
             event_ids.append(event_id)
             process = multiprocessing.Process(
-                target=run_speed_estimation, args=[camera, event_id, MAX_SPEED])
+                target=run_speed_estimation, args=[camera, event_id, MAX_SPEED, caps[camera]])
             process.start()
             processes.append(process)
 
@@ -102,6 +117,18 @@ def on_message(client, userdata, msg):
             del processes[i]
 
 
+def grab():
+    for camera_name in camera_names:
+        caps[camera_name].read()
+
+
+def scheduler():
+    schedule.every(1).minutes.do(grab)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
 if __name__ == '__main__':
     multiprocessing.set_start_method('spawn')
 
@@ -115,4 +142,6 @@ if __name__ == '__main__':
     # handles reconnecting.
     # Other loop*() functions are available that give a threaded interface and a
     # manual interface.
-    mqttc.loop_forever()
+    # mqttc.loop_forever()
+    mqttc.loop_start()
+    scheduler()
