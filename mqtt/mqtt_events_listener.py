@@ -30,12 +30,8 @@ event_ids = []
 processes = []
 speed_estimator = SpeedEstimator(MODEL)
 
-# caps for cameras
-camera_names = get_cameras_names_from_config()
-camera_addresses = [get_camera_address_from_config(camera_name) for camera_name in camera_names]
-caps = {camera_name : cv2.VideoCapture(camera_address)
-        for camera_name, camera_address in zip(camera_names, camera_addresses)}
-print(caps)
+# Caps for cameras
+caps = {}
 
 
 def run_speed_estimation(camera: str, event_id: str, permitted_speed: int):
@@ -131,6 +127,14 @@ def scheduler():
 
 if __name__ == '__main__':
     multiprocessing.set_start_method('spawn')
+
+    # Caps for cameras
+    camera_names = get_cameras_names_from_config()
+    camera_addresses = [get_camera_address_from_config(
+        camera_name) for camera_name in camera_names]
+    caps = {camera_name: cv2.VideoCapture(camera_address)
+            for camera_name, camera_address in zip(camera_names, camera_addresses)}
+    print(caps)
 
     mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     mqttc.on_connect = on_connect
