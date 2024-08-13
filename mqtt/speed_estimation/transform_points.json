@@ -1,6 +1,6 @@
 {
     "test": {
         "TARGET_WIDTH": 3,
-        "TARGET_HEIGHT": 30
+        "TARGET_HEIGHT": 96
     }
 }
