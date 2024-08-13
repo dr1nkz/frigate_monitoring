@@ -149,6 +149,6 @@ if __name__ == '__main__':
     # handles reconnecting.
     # Other loop*() functions are available that give a threaded interface and a
     # manual interface.
-    # mqttc.loop_forever()
-    mqttc.loop_start()
+    mqttc.loop_forever()
+    # mqttc.loop_start()
     # scheduler()
