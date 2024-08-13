@@ -34,7 +34,7 @@ speed_estimator = SpeedEstimator(MODEL)
 caps = {}
 
 
-def run_speed_estimation(camera: str, event_id: str, permitted_speed: int, cap: cv2.VideoCapture):
+def run_speed_estimation(camera: str, event_id: str, permitted_speed: int): # cap: cv2.VideoCapture
     """
     Invoke speed estimation process
 
@@ -44,7 +44,8 @@ def run_speed_estimation(camera: str, event_id: str, permitted_speed: int, cap: 
     """
     # subprocess.call(['python3', f'speed_estimation/speed_estimation.py',
     #                  camera, event_id, f'{permitted_speed}'])
-    speed_estimator(camera, event_id, permitted_speed, cap)
+    # speed_estimator(camera, event_id, permitted_speed, cap)
+    speed_estimator(camera, event_id, permitted_speed)
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
@@ -87,8 +88,10 @@ def on_message(client, userdata, msg):
         # Speed estimation
         if (end_time is None) and not (event_id in event_ids):
             event_ids.append(event_id)
+            # process = multiprocessing.Process(
+            #     target=run_speed_estimation, args=[camera, event_id, MAX_SPEED, caps[camera]])
             process = multiprocessing.Process(
-                target=run_speed_estimation, args=[camera, event_id, MAX_SPEED, caps[camera]])
+                target=run_speed_estimation, args=[camera, event_id, MAX_SPEED])
             process.start()
             processes.append(process)
 
@@ -129,12 +132,12 @@ if __name__ == '__main__':
     multiprocessing.set_start_method('spawn')
 
     # Caps for cameras
-    camera_names = get_cameras_names_from_config()
-    camera_addresses = [get_camera_address_from_config(
-        camera_name) for camera_name in camera_names]
-    caps = {camera_name: cv2.VideoCapture(camera_address)
-            for camera_name, camera_address in zip(camera_names, camera_addresses)}
-    print(caps)
+    # camera_names = get_cameras_names_from_config()
+    # camera_addresses = [get_camera_address_from_config(
+    #     camera_name) for camera_name in camera_names]
+    # caps = {camera_name: cv2.VideoCapture(camera_address)
+    #         for camera_name, camera_address in zip(camera_names, camera_addresses)}
+    # print(caps)
 
     mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     mqttc.on_connect = on_connect
@@ -148,4 +151,4 @@ if __name__ == '__main__':
     # manual interface.
     # mqttc.loop_forever()
     mqttc.loop_start()
-    scheduler()
+    # scheduler()

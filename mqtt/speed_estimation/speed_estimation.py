@@ -24,16 +24,16 @@ class SpeedEstimator:
     """
     Class for speed estimation of bojects
     """
+
     def __init__(self, model_path):
         self.yolov8_detector = YOLOv8(path=model_path,
-                             conf_thres=0.3,
-                             iou_thres=0.5)
+                                      conf_thres=0.3,
+                                      iou_thres=0.5)
 
-    def __call__(self, camera: str, event_id: str, permitted_speed: int, cap: cv2.VideoCapture):
-        self.speed_estimation(camera, event_id, permitted_speed, cap)
+    def __call__(self, camera: str, event_id: str, permitted_speed: int):
+        self.speed_estimation(camera, event_id, permitted_speed)
 
-
-    def speed_estimation(self, camera: str, event_id: str, permitted_speed: int, cap: cv2.VideoCapture):
+    def speed_estimation(self, camera: str, event_id: str, permitted_speed: int):
         """
         Speed estimation process
 
@@ -50,7 +50,7 @@ class SpeedEstimator:
 
         # Videocapturing
         # cv2.namedWindow('stream', cv2.WINDOW_NORMAL)
-        # cap = cv2.VideoCapture(address)
+        cap = cv2.VideoCapture(address)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -76,7 +76,7 @@ class SpeedEstimator:
 
         # Byte tracker for id of the object
         byte_track = sv.ByteTrack(frame_rate=fps,
-                                track_thresh=0.3)
+                                  track_thresh=0.3)
 
         # Maximal detected speed
         max_detected_speed = 0
@@ -89,7 +89,8 @@ class SpeedEstimator:
 
             # Detecting
             detected_img = frame.copy()
-            bounding_boxes, scores, class_ids = self.yolov8_detector(detected_img)
+            bounding_boxes, scores, class_ids = self.yolov8_detector(
+                detected_img)
             # print(bounding_boxes)
             bounding_boxes = np.array(bounding_boxes)[class_ids == 0]
             scores = np.array(scores)[class_ids == 0]
@@ -105,13 +106,14 @@ class SpeedEstimator:
 
             # Byte tracker
             detections = Detections(xyxy=bounding_boxes, confidence=scores,
-                                            class_id=class_ids, tracker_id=[None] * len(bounding_boxes))
+                                    class_id=class_ids, tracker_id=[None] * len(bounding_boxes))
             if len(detections.xyxy) != 0:
-                detections = byte_track.update_with_detections(detections=detections)
+                detections = byte_track.update_with_detections(
+                    detections=detections)
 
             # Bottom center anchors
             points = np.array([[x_1 + x_2 / 2, y]
-                            for [x_1, _, x_2, y] in detections.xyxy])
+                               for [x_1, _, x_2, y] in detections.xyxy])
             points = transformer.transform_points(points=points).astype(int)
 
             for tracker_id, point in zip(detections.tracker_id, points):
@@ -127,7 +129,7 @@ class SpeedEstimator:
                     y_start = coordinates[tracker_id][-1][1]
                     y_end = coordinates[tracker_id][0][1]
                     distance = np.sqrt((x_end - x_start)**2 +
-                                    (y_end - y_start)**2) / 10
+                                       (y_end - y_start)**2) / 10
 
                     time = len(coordinates[tracker_id]) / fps
                     speed = round(distance / time * 3.6, 2)
