@@ -34,7 +34,7 @@ speed_estimator = SpeedEstimator(MODEL)
 caps = {}
 
 
-def run_speed_estimation(camera: str, event_id: str, permitted_speed: int):
+def run_speed_estimation(camera: str, event_id: str, permitted_speed: int, cap: cv2.VideoCapture):
     """
     Invoke speed estimation process
 
@@ -44,7 +44,7 @@ def run_speed_estimation(camera: str, event_id: str, permitted_speed: int):
     """
     # subprocess.call(['python3', f'speed_estimation/speed_estimation.py',
     #                  camera, event_id, f'{permitted_speed}'])
-    speed_estimator(camera, event_id, permitted_speed)
+    speed_estimator(camera, event_id, permitted_speed, cap)
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
