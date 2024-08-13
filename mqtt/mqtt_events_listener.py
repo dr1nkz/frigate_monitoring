@@ -116,16 +116,16 @@ def on_message(client, userdata, msg):
             del processes[i]
 
 
-def grab():
-    for camera_name in camera_names:
-        caps[camera_name].read()
+# def grab():
+#     for camera_name in camera_names:
+#         caps[camera_name].read()
 
 
-def scheduler():
-    schedule.every(1).minutes.do(grab)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+# def scheduler():
+#     schedule.every(1).minutes.do(grab)
+#     while True:
+#         schedule.run_pending()
+#         time.sleep(1)
 
 
 if __name__ == '__main__':
