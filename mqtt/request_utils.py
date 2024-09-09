@@ -172,7 +172,7 @@ def get_transform_points_from_config(camera: str):
 
         source = [int(number) for number in source.split(',')]
         source = np.array(source).reshape(-1, 2).tolist()
-        source = sort_rectangle_points(source)
+        source = np.array(sort_rectangle_points(source))
 
         with open('speed_estimation/transform_points.json') as file:
             transform_points = json.loads(file.read())
