@@ -136,6 +136,10 @@ class SpeedEstimator:
 
                     max_detected_speed = speed if speed > max_detected_speed else max_detected_speed
 
+                    if (max_detected_speed > permitted_speed):
+                        set_retain_to_true(event_id)
+                        set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
+
                     # Caption on the frame
                     caption = f'#{tracker_id} {speed} km/h'  # caption
                     font = cv2.FONT_HERSHEY_SIMPLEX  # font
@@ -165,13 +169,13 @@ class SpeedEstimator:
 
         # Postprocessing
         if (max_detected_speed < permitted_speed):
-            pass
-            # if os.path.isfile(filename):
-            #     system_time.sleep(1)
-            #     os.remove(filename)
-        else:
-            set_retain_to_true(event_id)
-            set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
+            # pass
+            if os.path.isfile(filename):
+                system_time.sleep(1)
+                os.remove(filename)
+        # else:
+        #     set_retain_to_true(event_id)
+        #     set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
 
 
 if __name__ == '__main__':
