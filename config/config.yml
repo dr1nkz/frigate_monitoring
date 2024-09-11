@@ -273,3 +273,6 @@ cameras:
           roles:
             - record
             - detect
+    zones:
+      zone_0:
+        coordinates: 52,585,266,562,79,76,37,78
