@@ -99,11 +99,12 @@ def on_message(client, userdata, msg):
         if end_time is not None:
             event_ids.remove(event_id)
             if end_time - start_time > DURATION:
-                sublabel_to_set = 'Event longer than stated'
-                print('Event longer than stated')
-                set_retain_to_true(event_id)
-                if sub_label is None:
-                    set_sub_label(event_id, sublabel_to_set)
+                pass
+                # sublabel_to_set = 'Event longer than stated'
+                # print(f'Event {event_id} longer than stated')
+                # set_retain_to_true(event_id)
+                # if sub_label is None:
+                #     set_sub_label(event_id, sublabel_to_set)
 
     else:
         print(msg.topic+" "+str(msg.payload))

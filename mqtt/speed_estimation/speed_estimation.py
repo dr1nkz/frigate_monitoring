@@ -70,6 +70,11 @@ class SpeedEstimator:
 
         # For affine transforms
         SOURCE, TARGET = get_transform_points_from_config(camera=camera)
+        if SOURCE is None and TARGET is None and os.path.isfile(filename):
+            system_time.sleep(1)
+            os.remove(filename)
+            return
+        
         print(f'get_transform_points {SOURCE} {TARGET}')
         coordinates = defaultdict(lambda: deque(maxlen=fps))
         transformer = view_transformer(source=SOURCE, target=TARGET)
