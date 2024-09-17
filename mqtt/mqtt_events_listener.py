@@ -23,7 +23,7 @@ CAMERAS = os.getenv('CAMERAS').split()
 ZONES = os.getenv('ZONES').split()
 LABELS = os.getenv('LABELS').split()
 DURATION = int(os.getenv('DURATION'))
-MAX_SPEED = int(os.getenv('MAX_SPEED'))
+# MAX_SPEED = int(os.getenv('MAX_SPEED'))
 MODEL = os.getenv('MODEL')
 
 event_ids = []
@@ -34,7 +34,7 @@ speed_estimator = SpeedEstimator(MODEL)
 caps = {}
 
 
-def run_speed_estimation(camera: str, event_id: str, permitted_speed: int): # cap: cv2.VideoCapture
+def run_speed_estimation(camera: str, event_id: str): # cap: cv2.VideoCapture
     """
     Invoke speed estimation process
 
@@ -45,7 +45,7 @@ def run_speed_estimation(camera: str, event_id: str, permitted_speed: int): # ca
     # subprocess.call(['python3', f'speed_estimation/speed_estimation.py',
     #                  camera, event_id, f'{permitted_speed}'])
     # speed_estimator(camera, event_id, permitted_speed, cap)
-    speed_estimator(camera, event_id, permitted_speed)
+    speed_estimator(camera, event_id)
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
@@ -91,7 +91,7 @@ def on_message(client, userdata, msg):
             # process = multiprocessing.Process(
             #     target=run_speed_estimation, args=[camera, event_id, MAX_SPEED, caps[camera]])
             process = multiprocessing.Process(
-                target=run_speed_estimation, args=[camera, event_id, MAX_SPEED])
+                target=run_speed_estimation, args=[camera, event_id])
             process.start()
             processes.append(process)
 

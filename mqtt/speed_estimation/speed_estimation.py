@@ -16,7 +16,8 @@ from request_utils import (
     get_end_time,
     set_retain_to_true,
     set_sub_label,
-    get_transform_points_from_config
+    get_transform_points_from_config,
+    get_permitted_speed
 )
 
 
@@ -30,16 +31,15 @@ class SpeedEstimator:
                                       conf_thres=0.3,
                                       iou_thres=0.5)
 
-    def __call__(self, camera: str, event_id: str, permitted_speed: int):
-        self.speed_estimation(camera, event_id, permitted_speed)
+    def __call__(self, camera: str, event_id: str):
+        self.speed_estimation(camera, event_id)
 
     def speed_estimation(self, camera: str, event_id: str, permitted_speed: int):
         """
         Speed estimation process
 
         :camera: str - camera name
-        :event_id: str - id of the event
-        :permitted_speed: int - permitted speed to move
+        :event_id: str - id of the event        
         :cap: cv2.VideoCapture - 
         """
 
@@ -86,6 +86,8 @@ class SpeedEstimator:
         # Maximal detected speed
         max_detected_speed = 0
 
+        # Permitted speed to move
+        permitted_speed = get_permitted_speed(camera=camera)
         while cap.isOpened() and end_time is None:
             # Кадр с камеры
             ret, frame = cap.read()
@@ -187,12 +189,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('camera')
     parser.add_argument('event_id')
-    parser.add_argument('permitted_speed')
     args = parser.parse_args()
 
     camera = args.camera
     event_id = args.event_id
-    permitted_speed = int(args.permitted_speed)
 
     speed_estimator = SpeedEstimator(r'speed_estimation/clips_model.onnx')
-    speed_estimator(camera, event_id, permitted_speed)
+    speed_estimator(camera, event_id)

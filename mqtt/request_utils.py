@@ -192,6 +192,24 @@ def get_transform_points_from_config(camera: str):
     return source, target
 
 
+def get_permitted_speed(camera: str):
+    """
+    Get permitted speed for camera
+
+    :camera: str - camera name
+    :return: int - permitted speed for camera
+    """
+    try:
+        with open('speed_estimation/transform_points.json') as file:
+            transform_points = json.loads(file.read())
+        permitted_speed = transform_points[camera]['PERMITTED_SPEED']
+    except:
+        print(f'No permitted speed for camera \'{camera}\'')
+        permitted_speed = None
+
+    return permitted_speed
+
+
 def sort_rectangle_points(points):
     # Убедимся, что мы получили именно 4 точки
     if len(points) != 4:

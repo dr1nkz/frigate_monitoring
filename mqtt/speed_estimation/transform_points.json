@@ -1,10 +1,12 @@
 {
     "test": {
         "TARGET_WIDTH": 3,
-        "TARGET_HEIGHT": 96
+        "TARGET_HEIGHT": 96,
+        "PERMITTED_SPEED": 5
     },
     "test2": {
         "TARGET_WIDTH": 3,
-        "TARGET_HEIGHT": 96
+        "TARGET_HEIGHT": 96,
+        "PERMITTED_SPEED": 5
     }
 }
