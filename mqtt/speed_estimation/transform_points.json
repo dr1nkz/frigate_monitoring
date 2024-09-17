@@ -2,5 +2,9 @@
     "test": {
         "TARGET_WIDTH": 3,
         "TARGET_HEIGHT": 96
+    },
+    "test2": {
+        "TARGET_WIDTH": 3,
+        "TARGET_HEIGHT": 96
     }
 }

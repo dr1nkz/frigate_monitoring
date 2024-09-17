@@ -190,7 +190,7 @@ record:
     # Optional: Number of days to retain recordings regardless of events (default: shown below)
     # NOTE: This should be set to 0 and retention should be defined in events section below
     #       if you only want to retain recordings of events.
-    days: 3
+    days: 0
     # Optional: Mode for retention. Available options are: all, motion, and active_objects
     #   all - save all recording segments regardless of activity
     #   motion - save all recordings segments with any detected motion
@@ -221,7 +221,7 @@ record:
     # Optional: Retention settings for recordings of events
     retain:
       # Required: Default retention days (default: shown below)
-      default: 10
+      default: 1
       # Optional: Mode for retention. (default: shown below)
       #   all - save all recording segments for events regardless of activity
       #   motion - save all recordings segments for events with any detected motion
