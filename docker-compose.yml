@@ -15,6 +15,7 @@ services:
     container_name: frigate
     restart: unless-stopped
     build: .
+    shm_size: '2gb'
     # image: ghcr.io/blakeblackshear/frigate:stable
     environment:
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}

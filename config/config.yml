@@ -237,7 +237,7 @@ record:
       #   person: 15
 
 cameras:
-  test:
+  Reg13_cam19:
     enabled: true
 
     ffmpeg:
