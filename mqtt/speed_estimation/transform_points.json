@@ -1,32 +1,32 @@
 {
-    "test": {
+    "Reg13_cam19": {
         "TARGET_WIDTH": 2.9,
         "TARGET_HEIGHT": 96,
         "PERMITTED_SPEED": 5
     },
-    "test2": {
-        "TARGET_WIDTH": 3,
-        "TARGET_HEIGHT": 96,
+    "Reg04_cam07": {
+        "TARGET_WIDTH": 2.2,
+        "TARGET_HEIGHT": 46.1,
         "PERMITTED_SPEED": 5
     },
-    "test3": {
-        "TARGET_WIDTH": 2.9,
-        "TARGET_HEIGHT": 96,
+    "Reg05_cam32": {
+        "TARGET_WIDTH": 2.2,
+        "TARGET_HEIGHT": 72.1,
         "PERMITTED_SPEED": 5
     },
-    "test4": {
-        "TARGET_WIDTH": 2.9,
-        "TARGET_HEIGHT": 96,
+    "Reg02_cam13": {
+        "TARGET_WIDTH": 70,
+        "TARGET_HEIGHT": 5.6,
+        "PERMITTED_SPEED": 12
+    },
+    "Reg02_cam17": {
+        "TARGET_WIDTH": 24,
+        "TARGET_HEIGHT": 2.6,
         "PERMITTED_SPEED": 5
     },
-    "test5": {
-        "TARGET_WIDTH": 2.9,
-        "TARGET_HEIGHT": 96,
-        "PERMITTED_SPEED": 5
-    },
-    "test6": {
-        "TARGET_WIDTH": 2.9,
-        "TARGET_HEIGHT": 96,
-        "PERMITTED_SPEED": 5
+    "Reg06_cam25": {
+        "TARGET_WIDTH": 5.3,
+        "TARGET_HEIGHT": 150,
+        "PERMITTED_SPEED": 12
     }
 }
