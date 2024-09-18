@@ -1,11 +1,31 @@
 {
     "test": {
-        "TARGET_WIDTH": 3,
+        "TARGET_WIDTH": 2.9,
         "TARGET_HEIGHT": 96,
         "PERMITTED_SPEED": 5
     },
     "test2": {
         "TARGET_WIDTH": 3,
+        "TARGET_HEIGHT": 96,
+        "PERMITTED_SPEED": 5
+    },
+    "test3": {
+        "TARGET_WIDTH": 2.9,
+        "TARGET_HEIGHT": 96,
+        "PERMITTED_SPEED": 5
+    },
+    "test4": {
+        "TARGET_WIDTH": 2.9,
+        "TARGET_HEIGHT": 96,
+        "PERMITTED_SPEED": 5
+    },
+    "test5": {
+        "TARGET_WIDTH": 2.9,
+        "TARGET_HEIGHT": 96,
+        "PERMITTED_SPEED": 5
+    },
+    "test6": {
+        "TARGET_WIDTH": 2.9,
         "TARGET_HEIGHT": 96,
         "PERMITTED_SPEED": 5
     }

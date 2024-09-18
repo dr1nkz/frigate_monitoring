@@ -276,3 +276,47 @@ cameras:
     zones:
       zone_0:
         coordinates: 52,585,266,562,79,76,37,78
+  
+  test3:
+    enabled: true
+
+    ffmpeg:
+      hwaccel_args: preset-nvidia-h264
+      inputs:
+        - path: rtsp://admin:Zse45rdx@192.168.71.178:554/ISAPI/Streaming/Channels/01
+          roles:
+            - record
+            - detect
+
+  test4:
+    enabled: true
+
+    ffmpeg:
+      hwaccel_args: preset-nvidia-h264
+      inputs:
+        - path: rtsp://192.168.11.36:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
+          roles:
+            - record
+            - detect
+
+  test5:
+    enabled: true
+
+    ffmpeg:
+      hwaccel_args: preset-nvidia-h264
+      inputs:
+        - path: rtsp://admin:Zse45rdx@192.168.11.178:554/ISAPI/Streaming/Channels/01
+          roles:
+            - record
+            - detect
+
+  test6:
+    enabled: true
+
+    ffmpeg:
+      hwaccel_args: preset-nvidia-h264
+      inputs:
+        - path: rtsp://admin:Zse45rdx@192.168.71.79:554/ISAPI/Streaming/Channels/01
+          roles:
+            - record
+            - detect
