@@ -34,13 +34,13 @@ class SpeedEstimator:
     def __call__(self, camera: str, event_id: str):
         self.speed_estimation(camera, event_id)
 
-    def speed_estimation(self, camera: str, event_id: str, permitted_speed: int):
+    def speed_estimation(self, camera: str, event_id: str):
         """
         Speed estimation process
 
         :camera: str - camera name
         :event_id: str - id of the event        
-        :cap: cv2.VideoCapture - 
+        :cap: cv2.VideoCapture - VideoCapturing object
         """
 
         # Get camera address
