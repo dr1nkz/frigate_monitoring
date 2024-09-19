@@ -145,35 +145,38 @@ objects:
       # mask:
       #   - 0,480,341,480,347,0,0,0
 
+# detectors:
+#   ov:
+#     type: openvino
+#     device: AUTO
+#     model:
+#       path: /config/clips_model/clips_model.xml
+#       # path: /config/clips_model_v2/clips_model_v2.xml
+#       # path: /config/clips_model_9s/clips_model_9s.xml
+
+# model:
+#   width: 640
+#   height: 640
+#   input_tensor: nchw
+#   input_pixel_format: bgr
+#   model_type: yolov8
+#   labelmap_path: /config/clips_model/clips_model_labelmap.txt
+#   # labelmap_path: /config/clips_model_v2/clips_model_v2_labelmap.txt
+#   # labelmap_path: /config/clips_model_9s/clips_model_9s_labelmap.txt
+
 
 detectors:
-  ov:
-    type: openvino
-    device: AUTO
-    model:
-      # path: /config/yolov8/yolov8n.xml
-      # path: /config/hf/hf.xml
-      # path: /config/helmets/helmets.xml
-      # path: /config/human_forklift_helmet_vest/human_forklift_helmet_vest.xml
-      # path: /config/yolov9c/yolov9c.xml
-      path: /config/clips_model/clips_model.xml
-      # path: /config/clips_model_v2/clips_model_v2.xml
-      # path: /config/clips_model_9s/clips_model_9s.xml
+  tensorrt:
+    type: tensorrt
+    device: 0 #This is the default, select the first GPU
 
 model:
+  path: /config/model_cache/tensorrt/yolov7-640.trt
+  input_tensor: nchw
+  input_pixel_format: rgb
   width: 640
   height: 640
-  input_tensor: nchw
-  input_pixel_format: bgr
-  model_type: yolov8
-  # labelmap_path: /config/yolov8/coco_80cl.txt
-  # labelmap_path: /config/hf/hf_labelmap.txt
-  # labelmap_path: /config/helmets/helmets_labelmap.txt
-  # labelmap_path: /config/human_forklift_helmet_vest/human_forklift_helmet_vest_labelmap.txt
-  # labelmap_path: /config/yolov9c/yolov9c_labelmap.txt
-  labelmap_path: /config/clips_model/clips_model_labelmap.txt
-  # labelmap_path: /config/clips_model_v2/clips_model_v2_labelmap.txt
-  # labelmap_path: /config/clips_model_9s/clips_model_9s_labelmap.txt
+
 
 record:
   # Optional: Enable recording (default: shown below)
