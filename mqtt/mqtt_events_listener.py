@@ -5,7 +5,7 @@ import subprocess
 import multiprocessing
 
 import cv2
-import schedule
+# import schedule
 from dotenv import load_dotenv
 import paho.mqtt.client as mqtt
 import requests
