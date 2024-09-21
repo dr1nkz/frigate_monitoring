@@ -11,3 +11,4 @@ config/.timeline
 config/.vacuum
 config/frigate.db-shm
 config/frigate.db-wal
+storage/clips/preview_restart_cache
