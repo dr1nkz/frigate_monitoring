@@ -1,5 +1,25 @@
 services:
 
+  # CodeProjectAI:
+  #   image: codeproject/ai-server:cuda11_7
+  #   container_name: codeproject-ai-server-cuda
+  #   hostname: codeproject-ai-server
+  #   restart: unless-stopped
+  #   ports:
+  #     - "32168:32168"
+  #   volumes:
+  #     - ./code_project/clips_model:/app/preinstalled-modules/ObjectDetectionYolo/custom-models:ro
+  #   environment:
+  #     - TZ=Europe/Moscow
+  #     - CUSTOM_MODELS_DIR=/app/preinstalled-modules/ObjectDetectionYolo/custom-models
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [ gpu ]
+
   nanomq:
     image: emqx/nanomq:0.18.2-slim
     container_name: nanomq
