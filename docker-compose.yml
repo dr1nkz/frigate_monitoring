@@ -34,9 +34,9 @@ services:
   frigate:
     container_name: frigate
     restart: unless-stopped
-    # build: .
+    build: .
     shm_size: '192mb'
-    image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
+    # image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
     environment:
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
       - YOLO_MODELS=yolov7-640
