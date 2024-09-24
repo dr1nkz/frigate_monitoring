@@ -273,34 +273,34 @@ cameras:
         # Optional: Number of consecutive frames required for object to be considered present in the zone (default: shown below).
         inertia: 5
 
-  Reg04_cam07:
-    enabled: true
+  # Reg04_cam07:
+  #   enabled: true
 
-    ffmpeg:
-      hwaccel_args: preset-nvidia-h264
-      inputs:
-        - path: rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
-          roles:
-            - record
-            - detect
-    zones:
-      zone_0:
-        coordinates: 128,975,399,898,79,76,37,78
+  #   ffmpeg:
+  #     hwaccel_args: preset-nvidia-h264
+  #     inputs:
+  #       - path: rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
+  #         roles:
+  #           - record
+  #           - detect
+  #   zones:
+  #     zone_0:
+  #       coordinates: 128,975,399,898,79,76,37,78
 
-  Reg05_cam32:
-    enabled: true
+  # Reg05_cam32:
+  #   enabled: true
 
-    ffmpeg:
-      hwaccel_args: preset-nvidia-h264
-      inputs:
-        - path: rtsp://admin:Zse45rdx@192.168.71.178:554/ISAPI/Streaming/Channels/01
-          roles:
-            - record
-            - detect
+  #   ffmpeg:
+  #     hwaccel_args: preset-nvidia-h264
+  #     inputs:
+  #       - path: rtsp://admin:Zse45rdx@192.168.71.178:554/ISAPI/Streaming/Channels/01
+  #         roles:
+  #           - record
+  #           - detect
 
-    zones:
-      zone_0:
-        coordinates: 810,918,447,1039,410,117,444,110
+  #   zones:
+  #     zone_0:
+  #       coordinates: 810,918,447,1039,410,117,444,110
   Reg02_cam13:
     enabled: true
 
@@ -316,30 +316,33 @@ cameras:
     zones:
       zone_0:
         coordinates: 1743,187,1852,227,377,936,137,588
-  Reg02_cam17:
-    enabled: true
 
-    ffmpeg:
-      hwaccel_args: preset-nvidia-h264
-      inputs:
-        - path: rtsp://admin:Zse45rdx@192.168.11.178:554/ISAPI/Streaming/Channels/01
-          roles:
-            - record
-            - detect
+  # Reg02_cam17:
+  #   enabled: true
 
-    zones:
-      zone_0:
-        coordinates: 262,880,1659,217,1579,173,243,660
-  Reg06_cam25:
-    enabled: true
+  #   ffmpeg:
+  #     hwaccel_args: preset-nvidia-h264
+  #     inputs:
+  #       - path: rtsp://admin:Zse45rdx@192.168.11.178:554/ISAPI/Streaming/Channels/01
+  #         roles:
+  #           - record
+  #           - detect
 
-    ffmpeg:
-      hwaccel_args: preset-nvidia-h264
-      inputs:
-        - path: rtsp://admin:Zse45rdx@192.168.71.79:554/ISAPI/Streaming/Channels/01
-          roles:
-            - record
-            - detect
-    zones:
-      zone_0:
-        coordinates: 1112,861,137,197,99,204,545,1080
+  #   zones:
+  #     zone_0:
+  #       coordinates: 262,880,1659,217,1579,173,243,660
+  
+  # Reg06_cam25:
+  #   enabled: true
+
+  #   ffmpeg:
+  #     hwaccel_args: preset-nvidia-h264
+  #     inputs:
+  #       - path: rtsp://admin:Zse45rdx@192.168.71.79:554/ISAPI/Streaming/Channels/01
+  #         roles:
+  #           - record
+  #           - detect
+
+  #   zones:
+  #     zone_0:
+  #       coordinates: 1112,861,137,197,99,204,545,1080

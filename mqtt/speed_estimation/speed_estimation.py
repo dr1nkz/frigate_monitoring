@@ -57,11 +57,12 @@ class SpeedEstimator:
         fps = int(cap.get(cv2.CAP_PROP_FPS))
 
         # Videowriting
-        directory = '/storage/' + datetime.now().strftime(r'%d.%m.%Y/')
+        start_time = datetime.now()
+        directory = '/storage/' + start_time.strftime(r'%d.%m.%Y/')
         if not os.path.isdir(directory):
             os.mkdir(directory)
         filename = directory + camera + \
-            datetime.now().strftime(r'_%H:%M:%S_') + event_id + '.mp4'
+            start_time.strftime(r'_%H:%M:%S_') + event_id + '.mp4'
         out = cv2.VideoWriter(filename, fourcc, fps, (width, height))
         print(filename)
 
@@ -74,7 +75,7 @@ class SpeedEstimator:
             system_time.sleep(1)
             os.remove(filename)
             return
-        
+
         print(f'get_transform_points {SOURCE} {TARGET}')
         coordinates = defaultdict(lambda: deque(maxlen=fps))
         transformer = view_transformer(source=SOURCE, target=TARGET)
@@ -145,7 +146,8 @@ class SpeedEstimator:
 
                     if (max_detected_speed > permitted_speed):
                         set_retain_to_true(event_id)
-                        set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
+                        set_sub_label(
+                            event_id, f'Max speed: {max_detected_speed} km/h')
 
                     # Caption on the frame
                     caption = f'#{tracker_id} {speed} km/h'  # caption
@@ -157,8 +159,17 @@ class SpeedEstimator:
                     x_2 = bounding_box[2]
                     y_2 = bounding_box[3]
                     # Using cv2.putText() method
-                    cv2.putText(detected_img, caption, (int(x_1 + 2), int(y_1 + (y_2 - y_1) / 2)),
-                                font, fontScale, (255, 0, 0), thickness, cv2.LINE_AA)
+                    # cv2.putText(detected_img, caption, (int(x_1 + 2), int(y_1 + (y_2 - y_1) / 2)),
+                    #             font, fontScale, (255, 0, 0), thickness, cv2.LINE_AA)
+
+                    x, y = int(x_1) + 70, int(y_1 - 4 * thickness)
+                    (text_width, text_height), baseline = cv2.getTextSize(
+                        caption, font, fontScale, thickness)
+                    background_color = (254, 254, 254)
+                    cv2.rectangle(detected_img, (x, y - text_height), (x + text_width, y + int(baseline/2)),
+                                  background_color, thickness=cv2.FILLED)
+                    cv2.putText(detected_img, caption, (x, y), font,
+                                fontScale, (255, 0, 0), thickness, cv2.LINE_AA)
 
             # cv2.imshow('stream', detected_img)
             # if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -166,6 +177,10 @@ class SpeedEstimator:
 
             # Writing frame to file
             out.write(detected_img)  # frame
+
+            end_time = datetime.now()
+            if (end_time-start_time).total_seconds() > 300:
+                break
 
             # Get end time of the event
             end_time = get_end_time(event_id)
