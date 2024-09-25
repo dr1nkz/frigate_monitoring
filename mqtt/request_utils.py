@@ -1,4 +1,7 @@
 import requests
+import urllib.request as request
+import os
+import time as system_time
 import json
 import yaml
 import numpy as np
@@ -232,3 +235,34 @@ def sort_rectangle_points(points):
 
     # Возвращаем список, начинающийся с верхней левой точки
     return [top_left] + sorted_points
+
+
+def download_event_clip(event_id):
+    """
+    Download clip of the event
+
+    :event_id: str - id of the event
+    :return: bool - clip download result
+    """
+    filename = f'/speed_estimation/temp/{event_id}.mp4'
+    try:
+        url = f'{API_URL}events/{event_id}/clip.mp4'
+        request.urlretrieve(url, filename)
+        result = True
+    except:
+        result = False
+
+    return result
+
+
+def delete_event_clip(event_id):
+    """
+    Download clip of the event
+
+    :event_id: str - id of the event
+    :return: bool - clip download result
+    """
+    filename = f'/speed_estimation/temp/{event_id}.mp4'
+    if os.path.isfile(filename):
+        system_time.sleep(1)
+        os.remove(filename)

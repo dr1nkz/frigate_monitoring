@@ -17,7 +17,9 @@ from request_utils import (
     set_retain_to_true,
     set_sub_label,
     get_transform_points_from_config,
-    get_permitted_speed
+    get_permitted_speed,
+    download_event_clip,
+    delete_event_clip
 )
 
 
@@ -46,11 +48,15 @@ class SpeedEstimator:
         # Get camera address
         # address = f'rtsp://localhost:8554/{camera}'
         # address = get_camera_address(camera, login, password)
-        address = get_camera_address_from_config(camera)
+        # address = get_camera_address_from_config(camera)
+
+        # Download clip of the event
+        if not download_event_clip(event_id):
+            return
 
         # Videocapturing
         # cv2.namedWindow('stream', cv2.WINDOW_NORMAL)
-        cap = cv2.VideoCapture(address)
+        cap = cv2.VideoCapture(f'/mqtt/speed_estimation/temp/{event_id}.mp4')
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -188,6 +194,7 @@ class SpeedEstimator:
         # cv2.destroyAllWindows()
         cap.release()
         out.release()
+        delete_event_clip(event_id)
 
         # Postprocessing
         if (max_detected_speed < permitted_speed):
