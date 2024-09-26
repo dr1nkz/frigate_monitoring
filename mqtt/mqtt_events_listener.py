@@ -87,17 +87,17 @@ def on_message(client, userdata, msg):
 
         # Speed estimation
         if (end_time is None) and not (event_id in event_ids):
-            event_ids.append(event_id)
-            # process = multiprocessing.Process(
-            #     target=run_speed_estimation, args=[camera, event_id, MAX_SPEED, caps[camera]])
+            # event_ids.append(event_id)
+            pass
+
+        # Event longer than stated / Speed estimation
+        if end_time is not None:
+            # event_ids.remove(event_id)
             process = multiprocessing.Process(
                 target=run_speed_estimation, args=[camera, event_id])
             process.start()
             processes.append(process)
 
-        # Event longer than stated
-        if end_time is not None:
-            event_ids.remove(event_id)
             if end_time - start_time > DURATION:
                 pass
                 # sublabel_to_set = 'Event longer than stated'

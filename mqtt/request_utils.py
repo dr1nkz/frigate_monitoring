@@ -244,7 +244,7 @@ def download_event_clip(event_id):
     :event_id: str - id of the event
     :return: bool - clip download result
     """
-    filename = f'/speed_estimation/temp/{event_id}.mp4'
+    filename = f'/mqtt/speed_estimation/temp/{event_id}.mp4'
     try:
         url = f'{API_URL}events/{event_id}/clip.mp4'
         request.urlretrieve(url, filename)
@@ -262,7 +262,7 @@ def delete_event_clip(event_id):
     :event_id: str - id of the event
     :return: bool - clip download result
     """
-    filename = f'/speed_estimation/temp/{event_id}.mp4'
+    filename = f'/mqtt/speed_estimation/temp/{event_id}.mp4'
     if os.path.isfile(filename):
         system_time.sleep(1)
         os.remove(filename)
