@@ -249,8 +249,10 @@ def download_event_clip(event_id):
         url = f'{API_URL}events/{event_id}/clip.mp4'
         request.urlretrieve(url, filename)
         result = True
+        print('Clip downloaded')
     except:
         result = False
+        print('Clip download error')
 
     return result
 
