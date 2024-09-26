@@ -57,6 +57,7 @@ class SpeedEstimator:
         # Videocapturing
         # cv2.namedWindow('stream', cv2.WINDOW_NORMAL)
         cap = cv2.VideoCapture(f'/mqtt/speed_estimation/temp/{event_id}.mp4')
+        print(cap)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -73,7 +74,7 @@ class SpeedEstimator:
         print(filename)
 
         # Get end time of the event
-        end_time = get_end_time(event_id)
+        # end_time = get_end_time(event_id)
 
         # For affine transforms
         SOURCE, TARGET = get_transform_points_from_config(camera=camera)
@@ -95,7 +96,8 @@ class SpeedEstimator:
 
         # Permitted speed to move
         permitted_speed = get_permitted_speed(camera=camera)
-        while cap.isOpened() and end_time is None:
+        print(f'cap.isOpened(): {cap.isOpened()}')
+        while cap.isOpened():
             # Кадр с камеры
             ret, frame = cap.read()
             if not ret:
@@ -189,7 +191,7 @@ class SpeedEstimator:
                 break
 
             # Get end time of the event
-            end_time = get_end_time(event_id)
+            # end_time = get_end_time(event_id)
 
         # cv2.destroyAllWindows()
         cap.release()
