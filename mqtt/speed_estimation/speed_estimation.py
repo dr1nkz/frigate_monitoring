@@ -66,10 +66,13 @@ class SpeedEstimator:
         # Videowriting
         start_time = datetime.now()
         directory = '/storage/' + start_time.strftime(r'%d.%m.%Y/')
+        camera_name = camera.lower().replace('reg', 'r').replace('cam', 'c')
         if not os.path.isdir(directory):
             os.mkdir(directory)
-        filename = directory + camera + \
-            start_time.strftime(r'_%H:%M:%S_') + event_id + '.mp4'
+        filename = directory + camera_name + \
+            start_time.strftime(r'_%H.%M.%S') + '.mp4'
+        
+        
         out = cv2.VideoWriter(filename, fourcc, fps, (width, height))
         print(filename)
 
