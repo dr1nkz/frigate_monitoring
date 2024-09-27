@@ -37,14 +37,17 @@ LABELS = no_vest no_hemlet <br/>
 DURATION = 30 <br/>
 ##### Максимальная разрешенная скорость
 MAX_SPEED = 30 <br/><br/>
+##### Модель для распознавания
+MODEL = speed_estimation/clips_model.onnx
 
 #### transform_points.json по пути mqtt/speed_estimation/
-##### Координаты для афинных преобразования для определения скорости
+##### Опорные точки для определения скорости и макс. скорость
 ```json
 {
     "имя_камеры": {
         "TARGET_WIDTH" : ширина в метрах,
         "TARGET_HEIGHT" : высота в метрах,
+        "PERMITTED_SPEED": разрешенная скорость в км/ч,
     }
 }
 ```
