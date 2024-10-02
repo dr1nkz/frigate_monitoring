@@ -39,7 +39,7 @@ services:
     image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
     environment:
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
-      - YOLO_MODELS=yolov7-640
+      - YOLO_MODELS=yolov8-640
     # command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
     volumes:
       - ./config:/config

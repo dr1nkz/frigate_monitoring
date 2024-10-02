@@ -3,6 +3,7 @@ storage/recordings
 test.ipynb
 *.jpg
 *.mp4
+*trt
 mqtt/__pycache__
 mqtt/speed_estimation/__pycache__
 mqtt/tg_bot/__pycache__
