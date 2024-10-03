@@ -71,8 +71,7 @@ class SpeedEstimator:
             os.mkdir(directory)
         filename = directory + camera_name + \
             start_time.strftime(r'_%H.%M.%S') + '.mp4'
-        
-        
+
         out = cv2.VideoWriter(filename, fourcc, fps, (width, height))
         print(filename)
 
@@ -129,6 +128,9 @@ class SpeedEstimator:
             if len(detections.xyxy) != 0:
                 detections = byte_track.update_with_detections(
                     detections=detections)
+            else:
+                for key in coordinates:
+                    coordinates[key].clear()
 
             # Bottom center anchors
             points = np.array([[x_1 + x_2 / 2, y]
