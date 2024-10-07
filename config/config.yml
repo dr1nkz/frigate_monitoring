@@ -147,7 +147,7 @@ objects:
 detectors:
   ov:
     type: openvino
-    device: AUTO
+    device: GPU
     model:
       path: /config/clips_model/clips_model.xml
       # path: /config/clips_model_v2/clips_model_v2.xml

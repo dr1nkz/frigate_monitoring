@@ -64,6 +64,8 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [ gpu ]
+    devices:
+      - "/dev/dri"
 
   mqtt_events_listener:
     container_name: mqtt_events_listener
