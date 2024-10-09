@@ -13,3 +13,5 @@ config/frigate.db-shm
 config/frigate.db-wal
 storage/clips/preview_restart_cache
 config/model_cache/tensorrt
+config/backup.db
+config/backup_config.yaml
