@@ -250,7 +250,7 @@ cameras:
     enabled: true
 
     ffmpeg:
-      hwaccel_args: preset-nvidia-h264
+      # hwaccel_args: preset-nvidia-h264
       inputs:
         # - path: rtsp://admin:admin@192.168.0.39:1935
         # # - path: http://192.168.0.39:8080/video
@@ -305,7 +305,7 @@ cameras:
     enabled: true
 
     ffmpeg:
-      hwaccel_args: preset-nvidia-h264
+      # hwaccel_args: preset-nvidia-h264
       inputs:
         - path: 
             rtsp://192.168.11.36:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
