@@ -157,7 +157,8 @@ detectors:
 model:
   width: 640
   height: 640
-  input_tensor: nchw
+  # input_tensor: nchw
+  input_tensor: nhwc
   input_pixel_format: bgr
   model_type: yolov8
   labelmap_path: /config/forklift_model_new/forklift_model_new.txt
