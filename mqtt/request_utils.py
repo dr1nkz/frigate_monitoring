@@ -7,8 +7,8 @@ import yaml
 import numpy as np
 
 
-API_URL = 'http://frigate:5000/api/'
-
+FRIGATE_ADDRESS = os.getenv('FRIGATE_ADDRESS')
+API_URL = f'http://{FRIGATE_ADDRESS}:5000/api/'
 
 def set_retain_to_true(id: str):
     """

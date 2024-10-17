@@ -25,6 +25,7 @@ LABELS = os.getenv('LABELS').split()
 DURATION = int(os.getenv('DURATION'))
 # MAX_SPEED = int(os.getenv('MAX_SPEED'))
 MODEL = os.getenv('MODEL')
+NANOMQ_ADDRESS = os.getenv('NANOMQ_ADDRESS')
 
 event_ids = []
 processes = []
@@ -144,7 +145,8 @@ if __name__ == '__main__':
     mqttc.on_connect = on_connect
     mqttc.on_message = on_message
 
-    mqttc.connect("nanomq", 1883, 60)
+    # mqttc.connect("nanomq", 1883, 60)
+    mqttc.connect(NANOMQ_ADDRESS, 1883, 60)
 
     # Blocking call that processes network traffic, dispatches callbacks and
     # handles reconnecting.
