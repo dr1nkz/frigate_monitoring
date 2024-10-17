@@ -1,8 +1,0 @@
-# paths:
-#     cam1:
-#         source: rtsp://admin:admin@192.168.0.39:1935/video
-
-# paths:
-#     cam1:
-#         source: rtsp://admin:admin@192.168.0.39:1935/video
-#         runOnInit: ffmpeg -i rtsp://admin:admin@192.168.0.39:1935/video -c:v copy -c:a copy -f rtsp rtsp://localhost:8322/cam1`

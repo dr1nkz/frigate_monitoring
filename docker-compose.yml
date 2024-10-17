@@ -1,25 +1,5 @@
 services:
 
-  # CodeProjectAI:
-  #   image: codeproject/ai-server:cuda11_7
-  #   container_name: codeproject-ai-server-cuda
-  #   hostname: codeproject-ai-server
-  #   restart: unless-stopped
-  #   ports:
-  #     - "32168:32168"
-  #   volumes:
-  #     - ./code_project/clips_model:/app/preinstalled-modules/ObjectDetectionYolo/custom-models:ro
-  #   environment:
-  #     - TZ=Europe/Moscow
-  #     - CUSTOM_MODELS_DIR=/app/preinstalled-modules/ObjectDetectionYolo/custom-models
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [ gpu ]
-
   nanomq:
     image: emqx/nanomq:0.18.2-slim
     container_name: nanomq
@@ -39,7 +19,6 @@ services:
     # image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
     environment:
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
-      - YOLO_MODELS=yolov7-640
     # command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
     volumes:
       - ./config:/config
@@ -57,46 +36,5 @@ services:
       - "1984:1984"
       # - "8555:8555/tcp" # WebRTC over tcp
       # - "8555:8555/udp" # WebRTC over udp
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
     devices:
       - "/dev/dri"
-
-  mqtt_events_listener:
-    container_name: mqtt_events_listener
-    restart: unless-stopped
-    build: ./mqtt
-    environment:
-      - PYTHONPATH=/mqtt/speed_estimation
-      # - PYTHONPATH=/mqtt
-    command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
-    volumes:
-      - ./mqtt:/mqtt
-      - ./config/config.yml:/mqtt/config.yml
-      - /etc/localtime:/etc/localtime
-      - ./storage/speed_estimation:/storage
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
-  # mediamtx:
-  #   platform: linux/amd64
-  #   container_name: mediamtx-server
-  #   image: bluenviron/mediamtx:latest-ffmpeg
-  #   environment:
-  #     - RTSP_PROTOCOLS=tcp
-  #   # volumes:
-  #   #   - ./mediamtx/mediamtx.yml:/mediamtx.yml
-  #   ports:
-  #     - 8189:8189
-  #     - 8889:8889
-  #     - 8854:8554
-  #   restart: unless-stopped
