@@ -18,4 +18,4 @@ RUN wget https://github.com/intel/compute-runtime/releases/download/24.13.29138.
 RUN wget https://github.com/intel/compute-runtime/releases/download/24.13.29138.7/intel-opencl-icd_24.13.29138.7_amd64.deb
 RUN wget https://github.com/intel/compute-runtime/releases/download/24.13.29138.7/libigdgmm12_22.3.18_amd64.deb
 
-RUN dpkg -i *.deb
+RUN dpkg -i --ignore-depends *.deb
