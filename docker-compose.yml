@@ -15,6 +15,7 @@ services:
     container_name: frigate
     restart: unless-stopped
     build: .
+    privileged: true
     shm_size: '192mb'
     # image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
     environment:
