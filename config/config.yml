@@ -42,7 +42,7 @@ detect:
   height: 1080
   # Optional: desired fps for your camera for the input with the detect role (default: shown below)
   # NOTE: Recommended value of 5. Ideally, try and reduce your FPS on the camera.
-  fps: 5
+  fps: 12
   # Optional: enables detection for the camera (default: True)
   enabled: true
   # Optional: Number of consecutive detection hits required for an object to be initialized in the tracker. (default: 1/2 the frame rate)
@@ -317,7 +317,7 @@ cameras:
 
     zones:
       zone_0:
-        coordinates: 1743,187,1852,227,377,936,137,588
+        coordinates: 1754,194,1852,227,550,989,120,587
 
   # Reg02_cam17:
   #   enabled: true
