@@ -107,3 +107,12 @@ def xywh2xyxy(x):
     y[..., 2] = x[..., 0] + x[..., 2] / 2
     y[..., 3] = x[..., 1] + x[..., 3] / 2
     return y
+
+
+def deques_equal(deque1, deque2):
+    """
+    Сравнение deque
+    """
+    if len(deque1) != len(deque2):
+        return False
+    return all(np.array_equal(a, b) for a, b in zip(deque1, deque2))

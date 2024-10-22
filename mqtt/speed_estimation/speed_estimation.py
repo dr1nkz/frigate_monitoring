@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import sys
 import time as system_time
+from copy import deepcopy
 
 import cv2
 import numpy as np
@@ -11,6 +12,7 @@ import supervision as sv
 
 from detector import YOLOv8, Detections
 from view_transformer import view_transformer
+from utils import deques_equal
 from request_utils import (
     get_camera_address_from_config,
     get_end_time,
@@ -96,6 +98,9 @@ class SpeedEstimator:
         # Maximal detected speed
         max_detected_speed = 0
 
+        # Previous coordinates
+        coordinates_previous = None
+
         # Permitted speed to move
         permitted_speed = get_permitted_speed(camera=camera)
         print(f'cap.isOpened(): {cap.isOpened()}')
@@ -139,8 +144,15 @@ class SpeedEstimator:
 
             for tracker_id, point in zip(detections.tracker_id, points):
                 coordinates[tracker_id].append(point)
+            
+            # Check if coordinates are the same (object not tracked)
+            if coordinates_previous is not None:
+                for key in coordinates:
+                    if deques_equal(coordinates[key], coordinates_previous[key]):
+                        coordinates[key].clear()
+            coordinates_previous = deepcopy(coordinates)
 
-            # for class_id, bounding_box in zip(class_ids, bounding_boxes):
+            # Main loop
             for tracker_id, bounding_box in zip(detections.tracker_id, bounding_boxes):
                 # wait to have enough data
                 if len(coordinates[tracker_id]) > fps / 2:
