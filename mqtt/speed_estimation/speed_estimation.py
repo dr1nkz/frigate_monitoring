@@ -157,8 +157,10 @@ class SpeedEstimator:
                 # wait to have enough data
                 if len(coordinates[tracker_id]) > fps / 2:
                     # calculate the speed
-                    x_start = coordinates[tracker_id][-1][0]
-                    x_end = coordinates[tracker_id][0][0]
+                    # x_start = coordinates[tracker_id][-1][0]
+                    # x_end = coordinates[tracker_id][0][0]
+                    x_start = 0
+                    x_end = 0
                     y_start = coordinates[tracker_id][-1][1]
                     y_end = coordinates[tracker_id][0][1]
                     distance = np.sqrt((x_end - x_start)**2 +
