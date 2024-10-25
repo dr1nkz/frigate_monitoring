@@ -122,6 +122,15 @@ class SpeedEstimator:
             if detected_img is None:
                 continue
 
+            # Delete bboxes outside area
+            # if len(bounding_boxes) != 0:
+            #     points = np.array([[(x_1 + x_2) / 2, y]
+            #                 for [x_1, _, x_2, y] in bounding_boxes]).astype('int')
+            #     filtered_values = list(map(lambda x: bool(cv2.pointPolygonTest(SOURCE, x.tolist(), False)+1), points))
+            #     bounding_boxes = bounding_boxes[filtered_values]
+            #     scores = scores[filtered_values]
+            #     class_ids = class_ids[filtered_values]
+
             # iou fix if len == 1
             if len(bounding_boxes) == 1 or bounding_boxes.shape[0] == 1:
                 # bounding_boxes = np.array([bounding_boxes])
@@ -138,7 +147,7 @@ class SpeedEstimator:
                     coordinates[key].clear()
 
             # Bottom center anchors
-            points = np.array([[x_1 + x_2 / 2, y]
+            points = np.array([[(x_1 + x_2) / 2, y]
                                for [x_1, _, x_2, y] in detections.xyxy])
             points = transformer.transform_points(points=points).astype(int)
 
@@ -157,10 +166,8 @@ class SpeedEstimator:
                 # wait to have enough data
                 if len(coordinates[tracker_id]) > fps / 2:
                     # calculate the speed
-                    # x_start = coordinates[tracker_id][-1][0]
-                    # x_end = coordinates[tracker_id][0][0]
-                    x_start = 0
-                    x_end = 0
+                    x_start = coordinates[tracker_id][-1][0]
+                    x_end = coordinates[tracker_id][0][0]
                     y_start = coordinates[tracker_id][-1][1]
                     y_end = coordinates[tracker_id][0][1]
                     distance = np.sqrt((x_end - x_start)**2 +
@@ -168,6 +175,13 @@ class SpeedEstimator:
 
                     time = len(coordinates[tracker_id]) / fps
                     speed = round(distance / time * 3.6, 2)
+
+                    # speeds = []
+                    # for i in range(len(coordinates[tracker_id]) - 1):
+                    #     coordinates_start = coordinates[tracker_id][i]
+                    #     coordinates_end = coordinates[tracker_id][i+1]
+                    #     speeds.append(np.sqrt(np.sum((coordinates_start-coordinates_end)**2))/10*fps)
+                    # speed = round(np.array(speeds).mean() * 3.6, 2)
 
                     max_detected_speed = speed if speed > max_detected_speed else max_detected_speed
 
