@@ -12,7 +12,10 @@ import supervision as sv
 
 from detector import YOLOv8, Detections
 from view_transformer import view_transformer
-from utils import deques_equal
+from utils import (
+    deques_equal,
+    hampel
+)
 from request_utils import (
     get_camera_address_from_config,
     get_end_time,
@@ -101,6 +104,9 @@ class SpeedEstimator:
         # Previous coordinates
         coordinates_previous = None
 
+        # Array of speeds
+        speeds = np.array([])
+
         # Permitted speed to move
         permitted_speed = get_permitted_speed(camera=camera)
         print(f'cap.isOpened(): {cap.isOpened()}')
@@ -153,7 +159,7 @@ class SpeedEstimator:
 
             for tracker_id, point in zip(detections.tracker_id, points):
                 coordinates[tracker_id].append(point)
-            
+
             # Check if coordinates are the same (object not tracked)
             if coordinates_previous is not None:
                 for key in coordinates:
@@ -175,6 +181,7 @@ class SpeedEstimator:
 
                     time = len(coordinates[tracker_id]) / fps
                     speed = round(distance / time * 3.6, 2)
+                    speeds = np.append(speeds, speed)
 
                     # speeds = []
                     # for i in range(len(coordinates[tracker_id]) - 1):
@@ -183,12 +190,12 @@ class SpeedEstimator:
                     #     speeds.append(np.sqrt(np.sum((coordinates_start-coordinates_end)**2))/10*fps)
                     # speed = round(np.array(speeds).mean() * 3.6, 2)
 
-                    max_detected_speed = speed if speed > max_detected_speed else max_detected_speed
+                    # max_detected_speed = np.max([max_detected_speed, speed])
 
-                    if (max_detected_speed > permitted_speed):
-                        set_retain_to_true(event_id)
-                        set_sub_label(
-                            event_id, f'Max speed: {max_detected_speed} km/h')
+                    # if (max_detected_speed > permitted_speed):
+                    #     set_retain_to_true(event_id)
+                    #     set_sub_label(
+                    #         event_id, f'Max speed: {max_detected_speed} km/h')
 
                     # Caption on the frame
                     caption = f'#{tracker_id} {speed} km/h'  # caption
@@ -231,15 +238,18 @@ class SpeedEstimator:
         out.release()
         delete_event_clip(event_id)
 
+        # Applying Hampel filter for speed array and finding max value
+        max_detected_speed = np.nanmax(hampel(speeds))
+
         # Postprocessing
         if (max_detected_speed < permitted_speed):
             # pass
             if os.path.isfile(filename):
                 system_time.sleep(1)
                 os.remove(filename)
-        # else:
-        #     set_retain_to_true(event_id)
-        #     set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
+        else:
+            set_retain_to_true(event_id)
+            set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
 
 
 if __name__ == '__main__':

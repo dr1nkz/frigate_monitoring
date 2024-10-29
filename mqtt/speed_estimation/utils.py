@@ -116,3 +116,16 @@ def deques_equal(deque1, deque2):
     if len(deque1) != len(deque2):
         return False
     return all(np.array_equal(a, b) for a, b in zip(deque1, deque2))
+
+
+def hampel(vals_orig):
+    """
+    Вычисление
+    """
+    vals = vals_orig.copy()
+    difference = np.abs(np.median(vals)-vals)
+    median_abs_deviation = np.median(difference)
+    threshold = 3 * median_abs_deviation
+    outlier_idx = (difference > threshold) & (vals > np.median(vals))
+    vals[outlier_idx] = np.nan
+    return(vals)
