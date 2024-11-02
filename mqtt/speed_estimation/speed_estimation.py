@@ -21,7 +21,8 @@ from request_utils import (
     get_end_time,
     set_retain_to_true,
     set_sub_label,
-    get_transform_points_from_config,
+    get_transform_points_from_api,
+    get_all_zones_coordinates_from_api,
     get_permitted_speed,
     download_event_clip,
     delete_event_clip
@@ -84,7 +85,7 @@ class SpeedEstimator:
         # end_time = get_end_time(event_id)
 
         # For affine transforms
-        SOURCE, TARGET = get_transform_points_from_config(camera=camera)
+        SOURCE, TARGET = get_transform_points_from_api(camera=camera)
         if SOURCE is None and TARGET is None and os.path.isfile(filename):
             system_time.sleep(1)
             os.remove(filename)
@@ -129,13 +130,16 @@ class SpeedEstimator:
                 continue
 
             # Delete bboxes outside area
-            # if len(bounding_boxes) != 0:
-            #     points = np.array([[(x_1 + x_2) / 2, y]
-            #                 for [x_1, _, x_2, y] in bounding_boxes]).astype('int')
-            #     filtered_values = list(map(lambda x: bool(cv2.pointPolygonTest(SOURCE, x.tolist(), False)+1), points))
-            #     bounding_boxes = bounding_boxes[filtered_values]
-            #     scores = scores[filtered_values]
-            #     class_ids = class_ids[filtered_values]
+            allowed_zones = get_all_zones_coordinates_from_api(camera)
+            if len(bounding_boxes) != 0 and allowed_zones is not None:
+                for allowed_zone in allowed_zones:
+                    points = np.array([[(x_1 + x_2) / 2, y]
+                                       for [x_1, _, x_2, y] in bounding_boxes]).astype('int')
+                    filtered_values = list(map(lambda x: bool(
+                        cv2.pointPolygonTest(allowed_zone, x.tolist(), False)+1), points))
+                    bounding_boxes = bounding_boxes[filtered_values]
+                    scores = scores[filtered_values]
+                    class_ids = class_ids[filtered_values]
 
             # iou fix if len == 1
             if len(bounding_boxes) == 1 or bounding_boxes.shape[0] == 1:

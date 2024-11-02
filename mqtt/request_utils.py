@@ -10,6 +10,7 @@ import numpy as np
 FRIGATE_ADDRESS = os.getenv('FRIGATE_ADDRESS')
 API_URL = f'http://{FRIGATE_ADDRESS}:5000/api/'
 
+
 def set_retain_to_true(id: str):
     """
     Set retain to true for the event with matches id
@@ -132,7 +133,7 @@ def get_end_time(event_id: str):
     return end_time
 
 
-def get_transform_points(camera: str):
+def get_transform_points_config(camera: str):
     """
     Get transform points for camera
 
@@ -160,7 +161,56 @@ def get_transform_points(camera: str):
     return SOURCE, TARGET
 
 
-def get_transform_points_from_config(camera: str):
+def get_zone_coordinates_from_api(camera: str, zone_id: int):
+    """
+    Get transform points for camera
+
+    :camera: str - camera name
+    :zone_id: int - id of zone
+    :return: np.array(int) - zone coordinates for camera
+    """
+
+    try:
+        url = f'{API_URL}config'
+        response = requests.get(url=url).text
+        response = json.loads(response)
+        coordinates = response['cameras'][camera]['zones'][f'zone_{zone_id}']['coordinates']
+
+        coordinates = [int(number) for number in coordinates.split(',')]
+        coordinates = np.array(coordinates).reshape(-1, 2).tolist()
+        coordinates = np.array(sort_rectangle_points(coordinates))
+    except:
+        print('Zone not found')
+        coordinates = None
+    
+    return coordinates
+
+
+def get_all_zones_coordinates_from_api(camera: str):
+    """
+    Get transform points for camera
+
+    :camera: str - camera name
+    :return: np.array(int) - zone coordinates for camera
+    """    
+    zones_coordinates = []
+    counter = 0
+    while True:
+        coordinates = get_zone_coordinates_from_api(camera, counter)
+        if coordinates is None:
+            break
+        zones_coordinates.append(coordinates)
+        counter += 1
+    zones_coordinates = np.array(zones_coordinates)
+    
+    if zones_coordinates.shape[0] == 0:
+        print(f'Zones for camera {camera} not found')
+        zones_coordinates = None
+    
+    return zones_coordinates
+
+
+def get_transform_points_from_api(camera: str):
     """
     Get transform points for camera
 
@@ -168,15 +218,7 @@ def get_transform_points_from_config(camera: str):
     :return: np.array(int) - transform points for camera
     """
     try:
-        url = f'{API_URL}config'
-        response = requests.get(url=url).text
-        response = json.loads(response)
-        source = response["cameras"][camera]['zones']['zone_0']['coordinates']
-
-        source = [int(number) for number in source.split(',')]
-        source = np.array(source).reshape(-1, 2).tolist()
-        source = np.array(sort_rectangle_points(source))
-
+        source = get_zone_coordinates_from_api(camera, 0)
         with open('speed_estimation/transform_points.json') as file:
             transform_points = json.loads(file.read())
         target_width = transform_points[camera]['TARGET_WIDTH'] * 10
