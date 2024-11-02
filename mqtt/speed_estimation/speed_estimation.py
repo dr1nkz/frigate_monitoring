@@ -243,7 +243,10 @@ class SpeedEstimator:
         delete_event_clip(event_id)
 
         # Applying Hampel filter for speed array and finding max value
-        max_detected_speed = np.nanmax(hampel(speeds))
+        if speeds.shape[0] != 0:
+            max_detected_speed = np.nanmax(hampel(speeds))
+        else:
+            max_detected_speed = 0
 
         # Postprocessing
         if (max_detected_speed < permitted_speed):
