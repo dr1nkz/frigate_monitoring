@@ -182,7 +182,7 @@ def get_zone_coordinates_from_api(camera: str, zone_id: int):
     except:
         print('Zone not found')
         coordinates = None
-    
+
     return coordinates
 
 
@@ -192,9 +192,9 @@ def get_all_zones_coordinates_from_api(camera: str):
 
     :camera: str - camera name
     :return: np.array(int) - zone coordinates for camera
-    """    
+    """
     zones_coordinates = []
-    counter = 0
+    counter = 1
     while True:
         coordinates = get_zone_coordinates_from_api(camera, counter)
         if coordinates is None:
@@ -202,11 +202,11 @@ def get_all_zones_coordinates_from_api(camera: str):
         zones_coordinates.append(coordinates)
         counter += 1
     zones_coordinates = np.array(zones_coordinates)
-    
+
     if zones_coordinates.shape[0] == 0:
         print(f'Zones for camera {camera} not found')
         zones_coordinates = None
-    
+
     return zones_coordinates
 
 

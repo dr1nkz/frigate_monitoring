@@ -110,6 +110,10 @@ class SpeedEstimator:
 
         # Permitted speed to move
         permitted_speed = get_permitted_speed(camera=camera)
+
+        # Allowed zones for bboxes
+        allowed_zones = get_all_zones_coordinates_from_api(camera)
+
         print(f'cap.isOpened(): {cap.isOpened()}')
         while cap.isOpened():
             # Кадр с камеры
@@ -130,7 +134,6 @@ class SpeedEstimator:
                 continue
 
             # Delete bboxes outside area
-            allowed_zones = get_all_zones_coordinates_from_api(camera)
             if len(bounding_boxes) != 0 and allowed_zones is not None:
                 for allowed_zone in allowed_zones:
                     points = np.array([[(x_1 + x_2) / 2, y]
