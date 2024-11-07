@@ -135,14 +135,22 @@ class SpeedEstimator:
 
             # Delete bboxes outside area
             if len(bounding_boxes) != 0 and allowed_zones is not None:
+                # Calculate the center points of the bounding boxes
+                points = np.array([[(x_1 + x_2) / 2, y]
+                                   for [x_1, _, x_2, y] in bounding_boxes]).astype('int')
+
+                # Initialize an array to store whether points are within allowed zones
+                point_in_zone = np.zeros(len(points), dtype=bool)
+
+                # Check each allowed zone
                 for allowed_zone in allowed_zones:
-                    points = np.array([[(x_1 + x_2) / 2, y]
-                                       for [x_1, _, x_2, y] in bounding_boxes]).astype('int')
-                    filtered_values = list(map(lambda x: bool(
-                        cv2.pointPolygonTest(allowed_zone, x.tolist(), False)+1), points))
-                    bounding_boxes = bounding_boxes[filtered_values]
-                    scores = scores[filtered_values]
-                    class_ids = class_ids[filtered_values]
+                    # Update the boolean mask for points within the current allowed zone
+                    point_in_zone |= np.array(list(
+                        map(lambda x: cv2.pointPolygonTest(allowed_zone, x.tolist(), False) >= 0, points)))
+
+                # Use this mask to filter or index your points or bounding boxes
+                bounding_boxes = np.array(
+                    [box for index, box in enumerate(bounding_boxes) if point_in_zone[index]])
 
             # iou fix if len == 1
             if len(bounding_boxes) == 1 or bounding_boxes.shape[0] == 1:
