@@ -3,6 +3,7 @@ import os
 import time
 import subprocess
 import multiprocessing
+import shutil
 
 import cv2
 # import schedule
@@ -26,6 +27,7 @@ DURATION = int(os.getenv('DURATION'))
 # MAX_SPEED = int(os.getenv('MAX_SPEED'))
 MODEL = os.getenv('MODEL')
 NANOMQ_ADDRESS = os.getenv('NANOMQ_ADDRESS')
+LIFETIME = int(os.getenv('LIFETIME'))
 
 event_ids = []
 processes = []
@@ -33,6 +35,34 @@ speed_estimator = SpeedEstimator(MODEL)
 
 # Caps for cameras
 caps = {}
+
+
+def remove_old_directories(parent_dir: str):
+    """
+    Delete directories with videos older then LIFETIME
+
+    :parent_dir: str - path to directory with videos
+    """
+    # Получаем текущее время
+    current_time = time.time()
+
+    # Проходим по всем папкам в родительской директории
+    for folder_name in os.listdir(parent_dir):
+        folder_path = os.path.join(parent_dir, folder_name)
+
+        # Проверяем, является ли это папкой
+        if os.path.isdir(folder_path):
+            # Получаем время создания папки
+            creation_time = os.path.getctime(folder_path)
+
+            # Проверяем, превышает ли возраст папки заданный порог
+            if (current_time - creation_time) > LIFETIME * 24 * 3600:
+                # Удаляем папку
+                if os.path.exists(folder_path):
+                    shutil.rmtree(folder_path)
+                    print(f'Удалена папка: {folder_path}')
+                else:
+                    print(f'Папка {folder_path} не найдена')
 
 
 def run_speed_estimation(camera: str, event_id: str): # cap: cv2.VideoCapture
@@ -116,6 +146,8 @@ def on_message(client, userdata, msg):
         else:
             # Удаляем процесс из списка, если он завершил свою работу
             del processes[i]
+
+    remove_old_directories('/storage')
 
 
 # def grab():

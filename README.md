@@ -16,6 +16,8 @@ Ctrl + C - закрыть
 #### .env файл по пути mqtt/
 ##### Модель для распознавания
 MODEL = speed_estimation/clips_model.onnx
+##### Время, в течение которого хранятся видео с вычисленными скоростями (в днях)
+LIFETIME = 7
 ##### Адреса FRIGATE и NANOMQ
 NANOMQ_ADDRESS = ...
 FRIGATE_ADDRESS = ...
