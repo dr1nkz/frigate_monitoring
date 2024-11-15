@@ -28,6 +28,8 @@ DURATION = int(os.getenv('DURATION'))
 MODEL = os.getenv('MODEL')
 NANOMQ_ADDRESS = os.getenv('NANOMQ_ADDRESS')
 LIFETIME = int(os.getenv('LIFETIME'))
+LIFETIME_TEMP = int(os.getenv('LIFETIME_TEMP'))
+
 
 event_ids = []
 processes = []
@@ -65,7 +67,34 @@ def remove_old_directories(parent_dir: str):
                     print(f'Папка {folder_path} не найдена')
 
 
-def run_speed_estimation(camera: str, event_id: str): # cap: cv2.VideoCapture
+def remove_old_temp_files(parent_dir: str):
+    """
+    Delete temp files older then LIFETIME_TEMP
+
+    :parent_dir: str - path to directory with temp files
+    """
+    # Получаем текущее время
+    current_time = time.time()
+
+    # Проходим по всем файлам в родительской директории
+    for file_name in os.listdir(parent_dir):
+        filename = os.path.join(parent_dir, file_name)
+
+        # Проверяем, является ли это файл
+        if os.path.isfile(filename):
+            # Получаем время создания файла
+            creation_time = os.path.getctime(filename)
+
+            # Проверяем, превышает ли возраст файла заданный порог
+            if (current_time - creation_time) > LIFETIME_TEMP * 3600:
+                # Удаляем файл
+                os.remove(filename)
+                print(f'Удален файл: {filename}')
+        else:
+            print(f'Файл {filename} не найден')
+
+
+def run_speed_estimation(camera: str, event_id: str):  # cap: cv2.VideoCapture
     """
     Invoke speed estimation process
 
