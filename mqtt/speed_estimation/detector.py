@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 
 from utils import xywh2xyxy, nms, compute_iou
+from request_utils import get_labelmap
 
 
 @dataclass
@@ -160,9 +161,11 @@ class YOLOv8:
         """
         Нанесение прямоугольников
         """
-        classes = {
-            0: 'forklift'
-        }
+        classes = get_labelmap()
+
+        # classes = {
+        #     0: 'forklift'
+        # }
 
         # classes = {
         #     0: 'forklift',

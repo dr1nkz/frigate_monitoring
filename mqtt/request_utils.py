@@ -9,6 +9,8 @@ import numpy as np
 
 FRIGATE_ADDRESS = os.getenv('FRIGATE_ADDRESS')
 API_URL = f'http://{FRIGATE_ADDRESS}:5000/api/'
+LABELMAP_PATH = os.getenv('LABELMAP')
+print(LABELMAP_PATH)
 
 
 def set_retain_to_true(id: str):
@@ -301,12 +303,26 @@ def download_event_clip(event_id):
 
 def delete_event_clip(event_id):
     """
-    Download clip of the event
+    Delete clip of the event
 
     :event_id: str - id of the event
-    :return: bool - clip download result
     """
     filename = f'/mqtt/speed_estimation/temp/{event_id}.mp4'
     if os.path.isfile(filename):
         system_time.sleep(1)
         os.remove(filename)
+
+
+def get_labelmap():
+    """
+    Download clip of the event
+
+    :return: json - clip download result
+    """
+    try:
+        with open(LABELMAP_PATH) as file:
+            labelmap = dict(enumerate(file.read().splitlines()))
+    except:
+        print(f'No labelmap on \'{LABELMAP_PATH}\' found')
+        labelmap = None
+    return labelmap
