@@ -42,13 +42,13 @@ detect:
   height: 1080
   # Optional: desired fps for your camera for the input with the detect role (default: shown below)
   # NOTE: Recommended value of 5. Ideally, try and reduce your FPS on the camera.
-  fps: 12
+  fps: 5
   # Optional: enables detection for the camera (default: True)
   enabled: true
   # Optional: Number of consecutive detection hits required for an object to be initialized in the tracker. (default: 1/2 the frame rate)
   min_initialized: 2
   # Optional: Number of frames without a detection before Frigate considers an object to be gone. (default: 5x the frame rate)
-  max_disappeared: 25
+  max_disappeared: 100
   # Optional: Configuration for stationary object tracking
   stationary:
     # Optional: Frequency for confirming stationary objects (default: same as threshold)
@@ -86,7 +86,7 @@ objects:
   # Optional: list of objects to track from labelmap.txt (default: shown below)
   track:
     # - person
-    - forklift
+  - forklift
 
     # - каска
     # - нет-каски
@@ -149,7 +149,8 @@ detectors:
     type: openvino
     device: GPU
     model:
-      path: /config/forklift_model_new/forklift_model_new.xml
+      path: /config/forklift_cabledrum_model/forklift_cabledrum_model.xml
+      # path: /config/forklift_model_new/forklift_model_new.xml
       # path: /config/clips_model/clips_model.xml
       # path: /config/clips_model_v2/clips_model_v2.xml
       # path: /config/clips_model_9s/clips_model_9s.xml
@@ -160,7 +161,8 @@ model:
   input_tensor: nchw
   input_pixel_format: bgr
   model_type: yolov8
-  labelmap_path: /config/forklift_model_new/forklift_model_new.txt
+  labelmap_path: /config/forklift_cabledrum_model/forklift_cabledrum_model_labelmap.txt
+  # labelmap_path: /config/forklift_model_new/forklift_model_new.txt
   # labelmap_path: /config/clips_model/clips_model_labelmap.txt
   # labelmap_path: /config/clips_model_v2/clips_model_v2_labelmap.txt
   # labelmap_path: /config/clips_model_9s/clips_model_9s_labelmap.txt
@@ -232,7 +234,7 @@ record:
     # Optional: Retention settings for recordings of events
     retain:
       # Required: Default retention days (default: shown below)
-      default: 1
+      default: 0
       # Optional: Mode for retention. (default: shown below)
       #   all - save all recording segments for events regardless of activity
       #   motion - save all recordings segments for events with any detected motion
@@ -261,90 +263,124 @@ cameras:
         #     - detect
         #     - record
 
-        - path: 
-            rtsp://192.168.11.2:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
+      - path: 
+          rtsp://192.168.11.2:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
         # - path: rtsp://mediamtx-server:8554/stream0.sdp
           # input_args: preset-rtsp-restream
-          roles:
-            - record
-            - detect
+        roles:
+        - record
+        - detect
 
     zones:
       zone_0:
         coordinates: 297,979,719,799,122,156,74,168
         # Optional: Number of consecutive frames required for object to be considered present in the zone (default: shown below).
         inertia: 5
+      zone_1:
+        coordinates: 268,1080,1131,1080,192,176,61,209
+      zone_2:
+        coordinates: 932,1080,1873,349,1699,279,0,1080
 
-  # Reg04_cam07:
-  #   enabled: true
+    objects:
+      filters:
+        forklift:
+          mask:
+          - 349,0,123,101,1043,365,1061,445
 
-  #   ffmpeg:
-  #     hwaccel_args: preset-vaapi
-  #     inputs:
-  #       - path: rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
-  #         roles:
-  #           - record
-  #           - detect
-  #   zones:
-  #     zone_0:
-  #       coordinates: 128,975,399,898,79,76,37,78
 
-  # Reg05_cam32:
-  #   enabled: true
-
-  #   ffmpeg:
-  #     hwaccel_args: preset-vaapi
-  #     inputs:
-  #       - path: rtsp://admin:Zse45rdx@192.168.71.178:554/ISAPI/Streaming/Channels/01
-  #         roles:
-  #           - record
-  #           - detect
-
-  #   zones:
-  #     zone_0:
-  #       coordinates: 810,918,447,1039,410,117,444,110
-  Reg02_cam13:
+  Reg05_cam32:
     enabled: true
 
     ffmpeg:
       hwaccel_args: preset-vaapi
       inputs:
-        - path: 
-            rtsp://192.168.11.36:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
-          roles:
-            - record
-            - detect
+      - path: rtsp://admin:Zse45rdx@192.168.71.178:554/ISAPI/Streaming/Channels/01
+        roles:
+        - record
+        - detect
 
     zones:
       zone_0:
-        coordinates: 1754,194,1852,227,550,989,120,587
+        coordinates: 810,918,447,1039,410,117,444,110
+      zone_1:
+        coordinates: 423,1080,1250,1080,490,197,401,215
+      zone_2:
+        coordinates: 408,343,527,1080,0,1080,97,403
+      zone_3:
+        coordinates: 1621,411,1920,573,1220,1080,866,709
 
-  # Reg02_cam17:
+
+  # Reg02_cam13:
   #   enabled: true
 
   #   ffmpeg:
   #     hwaccel_args: preset-vaapi
   #     inputs:
-  #       - path: rtsp://admin:Zse45rdx@192.168.11.178:554/ISAPI/Streaming/Channels/01
-  #         roles:
-  #           - record
-  #           - detect
+  #     - path: rtsp://admin:Zse45rdx@192.168.11.36:554/ISAPI/Streaming/Channels/01
+  #       roles:
+  #       - record
+  #       - detect
 
   #   zones:
   #     zone_0:
-  #       coordinates: 262,880,1659,217,1579,173,243,660
-  
-  # Reg06_cam25:
-  #   enabled: true
+  #       coordinates: 1754,194,1852,227,550,989,120,587
+  #     zone_1:
+  #       coordinates: 750,983,1837,246,1738,210,0,679
+  #     zone_2:
+  #       coordinates: 0,1080,801,1080,786,912,0,659
 
-  #   ffmpeg:
-  #     hwaccel_args: preset-vaapi
-  #     inputs:
-  #       - path: rtsp://admin:Zse45rdx@192.168.71.79:554/ISAPI/Streaming/Channels/01
-  #         roles:
-  #           - record
-  #           - detect
 
-  #   zones:
-  #     zone_0:
-  #       coordinates: 1112,861,137,197,99,204,545,1080
+  Reg04_cam07:
+    enabled: true
+
+    ffmpeg:
+      hwaccel_args: preset-vaapi
+      inputs:
+      - path: rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
+        roles:
+        - record
+        - detect
+    zones:
+      zone_0:
+        coordinates: 128,975,399,898,79,76,37,78
+      zone_1:
+        coordinates: 51,1080,690,1080,101,141,25,146
+      zone_2:
+        coordinates: 130,1080,1407,603,1083,412,0,531
+
+
+  Reg02_cam17:
+    enabled: true
+
+    ffmpeg:
+      hwaccel_args: preset-vaapi
+      inputs:
+      - path: rtsp://admin:Zse45rdx@192.168.11.178:554/ISAPI/Streaming/Channels/01
+        roles:
+        - record
+        - detect
+
+    zones:
+      zone_0:
+        coordinates: 262,880,1659,217,1579,173,243,660
+      zone_1:
+        coordinates: 25,1080,1733,254,1493,144,0,626
+
+
+  Reg06_cam25:
+    enabled: true
+
+    ffmpeg:
+      hwaccel_args: preset-vaapi
+      inputs:
+      - path: rtsp://admin:Zse45rdx@192.168.71.79:554/ISAPI/Streaming/Channels/01
+        roles:
+        - record
+        - detect
+    zones:
+      zone_0:
+        coordinates: 1112,861,137,197,99,204,545,1080
+      zone_1:
+        coordinates: 1920,1080,269,251,119,276,348,1080
+      zone_2:
+        coordinates: 1920,1080,1920,724,735,349,515,385
