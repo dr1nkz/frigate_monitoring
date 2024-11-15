@@ -18,6 +18,8 @@ Ctrl + C - закрыть
 MODEL = speed_estimation/clips_model.onnx
 ##### Время, в течение которого хранятся видео с вычисленными скоростями (в днях)
 LIFETIME = 7
+##### Время, в течение которого хранятся временные файлы (в часах)
+LIFETIME_TEMP = 1
 ##### Адреса FRIGATE и NANOMQ
 NANOMQ_ADDRESS = ...
 FRIGATE_ADDRESS = ...
