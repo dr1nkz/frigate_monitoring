@@ -19,4 +19,14 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [ gpu ]
-  
+
+  filebrowser:
+    container_name: filebrowser
+    restart: unless-stopped
+    image: filebrowser/filebrowser
+    volumes:
+      - ./speed_estimation:/srv
+      - ./filebrowser/filebrowser.db:/database.db
+      # - ./filebrowser/.filebrowser.json:/.filebrowser.json
+    ports:
+      - 80:80

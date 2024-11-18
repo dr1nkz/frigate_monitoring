@@ -10,6 +10,11 @@ docker compose up -d
 docker compose logs -f <br/>
 Ctrl + C - закрыть
 
+### Сервис доступен по адресу
+http://localhost
+или
+http://localhost:80
+
 ## Настройка Frigate
 
 ### Настройка слушателя сообщений
