@@ -25,7 +25,8 @@ from request_utils import (
     get_all_zones_coordinates_from_api,
     get_permitted_speed,
     download_event_clip,
-    delete_event_clip
+    delete_event_clip,
+    codec_change
 )
 
 
@@ -71,24 +72,25 @@ class SpeedEstimator:
 
         # Videowriting
         start_time = datetime.now()
+        directory_temp = '/mqtt/speed_estimation/temp/'
         directory = '/storage/' + start_time.strftime(r'%d.%m.%Y/')
         camera_name = camera.lower().replace('reg', 'r').replace('cam', 'c')
-        if not os.path.isdir(directory):
-            os.mkdir(directory)
-        filename = directory + camera_name + \
+        if not os.path.isdir(directory_temp):
+            os.mkdir(directory_temp)
+        filepath = directory_temp + camera_name + \
             start_time.strftime(r'_%H.%M.%S') + '.mp4'
 
-        out = cv2.VideoWriter(filename, fourcc, fps, (width, height))
-        print(filename)
+        out = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
+        print(filepath)
 
         # Get end time of the event
         # end_time = get_end_time(event_id)
 
         # For affine transforms
         SOURCE, TARGET = get_transform_points_from_api(camera=camera)
-        if SOURCE is None and TARGET is None and os.path.isfile(filename):
+        if SOURCE is None and TARGET is None and os.path.isfile(filepath):
             system_time.sleep(1)
-            os.remove(filename)
+            os.remove(filepath)
             return
 
         print(f'get_transform_points {SOURCE} {TARGET}')
@@ -262,12 +264,13 @@ class SpeedEstimator:
         # Postprocessing
         if (max_detected_speed < permitted_speed):
             # pass
-            if os.path.isfile(filename):
+            if os.path.isfile(filepath):
                 system_time.sleep(1)
-                os.remove(filename)
+                os.remove(filepath)
         else:
             set_retain_to_true(event_id)
             set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
+            codec_change(directory, filepath)
 
 
 if __name__ == '__main__':

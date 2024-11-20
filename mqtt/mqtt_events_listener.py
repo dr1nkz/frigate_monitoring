@@ -177,6 +177,7 @@ def on_message(client, userdata, msg):
             del processes[i]
 
     remove_old_directories('/storage')
+    remove_old_temp_files('/mqtt/speed_estimation/temp')
 
 
 # def grab():

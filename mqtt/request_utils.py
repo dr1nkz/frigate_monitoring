@@ -326,3 +326,18 @@ def get_labelmap():
         print(f'No labelmap on \'{LABELMAP_PATH}\' found')
         labelmap = None
     return labelmap
+
+
+def codec_change(directory: str, filepath: str):
+    """
+    Change codec of the output video
+
+    :directory: str - directory to store video with changed codec
+    :filename: str - temp video path
+    """
+    
+    try:
+        filename = os.path.basename(filepath)
+        os.system(f"ffmpeg -i {filepath} {directory}{filename}")
+    except:
+        print(f'Error while changing {filename} video codec')
