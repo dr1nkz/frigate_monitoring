@@ -7,12 +7,12 @@
     "Reg04_cam07": {
         "TARGET_WIDTH": 2.2,
         "TARGET_HEIGHT": 46.1,
-        "PERMITTED_SPEED": 5
+        "PERMITTED_SPEED": 6
     },
     "Reg05_cam32": {
         "TARGET_WIDTH": 2.2,
         "TARGET_HEIGHT": 72.1,
-        "PERMITTED_SPEED": 5
+        "PERMITTED_SPEED": 6
     },
     "Reg02_cam13": {
         "TARGET_WIDTH": 70,
@@ -22,7 +22,7 @@
     "Reg02_cam17": {
         "TARGET_WIDTH": 24,
         "TARGET_HEIGHT": 2.6,
-        "PERMITTED_SPEED": 5
+        "PERMITTED_SPEED": 6
     },
     "Reg06_cam25": {
         "TARGET_WIDTH": 5.3,
