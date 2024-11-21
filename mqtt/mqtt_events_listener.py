@@ -78,6 +78,8 @@ def remove_old_temp_files(parent_dir: str):
 
     # Проходим по всем файлам в родительской директории
     for file_name in os.listdir(parent_dir):
+        if file_name == '.gitkeep':
+            continue
         filename = os.path.join(parent_dir, file_name)
 
         # Проверяем, является ли это файл
