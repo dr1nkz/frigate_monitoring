@@ -164,15 +164,6 @@ class YOLOv8:
         classes = get_labelmap()
 
         # classes = {
-        #     0: 'forklift'
-        # }
-
-        # classes = {
-        #     0: 'forklift',
-        #     1: 'person'
-        # }
-
-        # classes = {
         #     0: 'person',
         #     1: 'bicycle',
         #     2: 'car',
@@ -259,6 +250,11 @@ class YOLOv8:
         # class_names = ['person']
         rng = np.random.default_rng(3)
         colors = rng.uniform(0, 255, size=(len(class_names), 3))
+
+        # Filter only #0 class
+        self.boxes = self.boxes[self.class_ids == 0]
+        self.scores = self.scores[self.class_ids == 0]
+        self.class_ids = self.class_ids[self.class_ids == 0]
 
         # Прямоугольники
         for box, score, class_id in zip(self.boxes, self.scores, self.class_ids):
