@@ -99,7 +99,7 @@ class SpeedEstimator:
 
         # Byte tracker for id of the object
         byte_track = sv.ByteTrack(frame_rate=fps,
-                                  track_thresh=0.3)
+                                  track_activation_threshold=0.3)
 
         # Maximal detected speed
         max_detected_speed = 0
@@ -270,7 +270,7 @@ class SpeedEstimator:
         else:
             set_retain_to_true(event_id)
             set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
-            codec_change(directory, filepath)
+            codec_change(directory, filepath, max_detected_speed)
 
 
 if __name__ == '__main__':
