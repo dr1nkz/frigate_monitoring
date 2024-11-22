@@ -252,7 +252,7 @@ class YOLOv8:
         colors = rng.uniform(0, 255, size=(len(class_names), 3))
 
         # Filter only #0 class
-        if self.boxes.shape[0] != 0:
+        if len(self.boxes) != 0:
             self.boxes = np.array(self.boxes)[self.class_ids == 0]
             self.scores = np.array(self.scores)[self.class_ids == 0]
             self.class_ids = np.array(self.class_ids)[self.class_ids == 0]
