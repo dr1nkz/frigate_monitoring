@@ -10,7 +10,6 @@ import numpy as np
 FRIGATE_ADDRESS = os.getenv('FRIGATE_ADDRESS')
 API_URL = f'http://{FRIGATE_ADDRESS}:5000/api/'
 LABELMAP_PATH = os.getenv('LABELMAP')
-print(LABELMAP_PATH)
 
 
 def set_retain_to_true(id: str):
