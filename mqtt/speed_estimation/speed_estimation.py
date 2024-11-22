@@ -72,11 +72,11 @@ class SpeedEstimator:
 
         # Videowriting
         start_time = datetime.now()
-        directory_temp = '/mqtt/speed_estimation/temp/'
         directory = '/storage/' + start_time.strftime(r'%d.%m.%Y/')
-        camera_name = camera.lower().replace('reg', 'r').replace('cam', 'c')
-        if not os.path.isdir(directory_temp):
-            os.mkdir(directory_temp)
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
+        camera_name = camera.lower().replace('reg', 'r').replace('cam', 'c')        
+        directory_temp = '/mqtt/speed_estimation/temp/'
         filepath = directory_temp + camera_name + \
             start_time.strftime(r'_%H.%M.%S') + '.mp4'
 
