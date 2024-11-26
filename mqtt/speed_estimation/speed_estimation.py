@@ -153,6 +153,10 @@ class SpeedEstimator:
                 # Use this mask to filter or index your points or bounding boxes
                 bounding_boxes = np.array(
                     [box for index, box in enumerate(bounding_boxes) if point_in_zone[index]])
+                scores = np.array(
+                    [score for index, score in enumerate(scores) if point_in_zone[index]])
+                class_ids = np.array(
+                    [class_id for index, class_id in enumerate(class_ids) if point_in_zone[index]])
 
             # iou fix if len == 1
             if len(bounding_boxes) == 1 or bounding_boxes.shape[0] == 1:
