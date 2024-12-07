@@ -261,11 +261,6 @@ class SpeedEstimator:
                     detected_img = draw_speed_caption(
                         detected_img, np.array(bounding_box).astype('int'), id, speed)
 
-            # Show frame
-            cv2.imshow('stream', detected_img)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
             # Writing frame to file
             out.write(detected_img)  # frame
 
