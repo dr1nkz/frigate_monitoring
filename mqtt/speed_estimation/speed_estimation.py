@@ -18,7 +18,7 @@ from detector import (
     draw_speed_caption
 )
 from view_transformer import view_transformer
-from utils import   deques_equal
+from utils import deques_equal
 from request_utils import (
     get_camera_address_from_config,
     get_end_time,
@@ -185,12 +185,15 @@ class SpeedEstimator:
                     time = len(coordinates[tracker_id]) / fps
                     speed = round(distance / time * 3.6, 2)
 
-                     # bsss dictionary data append
+                    # bsss dictionary data append
                     if bsss_dictionary.get(tracker_id) is None:
-                        bsss_dictionary[tracker_id] = BboxesStableframesSpeedsScores([], [], [], [])
-                        bsss_dictionary[tracker_id].stable_frames.extend(unstable_frames_counter*[False])
+                        bsss_dictionary[tracker_id] = BboxesStableframesSpeedsScores(
+                            [], [], [], [])
+                        bsss_dictionary[tracker_id].stable_frames.extend(
+                            unstable_frames_counter*[False])
 
-                    bsss_dictionary[tracker_id].bounding_boxes.append(bounding_box)
+                    bsss_dictionary[tracker_id].bounding_boxes.append(
+                        bounding_box)
                     bsss_dictionary[tracker_id].stable_frames[-1] = True
                     bsss_dictionary[tracker_id].speeds.append(speed)
                     bsss_dictionary[tracker_id].scores.append(score)
@@ -200,22 +203,24 @@ class SpeedEstimator:
             if (end_time-start_time).total_seconds() > 300:
                 break
 
-        cap.release()        
-        
-        # Speed outliers deleting        
+        cap.release()
+
+        # Speed outliers deleting
         max_detected_speed = 0
 
         for id in bsss_dictionary:
             if len(bsss_dictionary[id].speeds) != 0:
-                max_item_speed = np.max(np.array(bsss_dictionary[id].hampel_with_outliers_replacing()))
-                max_detected_speed = np.max(np.array([max_item_speed, max_detected_speed]))
+                max_item_speed = np.max(
+                    np.array(bsss_dictionary[id].hampel_with_outliers_replacing()))
+                max_detected_speed = np.max(
+                    np.array([max_item_speed, max_detected_speed]))
 
         median_speed = 0
         if bsss_dictionary.get(1):
-            median_speed = round(np.median(np.array(bsss_dictionary[1].speeds)), 2)
+            median_speed = round(
+                np.median(np.array(bsss_dictionary[1].speeds)), 2)
 
-
-        #--------------------Visual video processing--------------------
+        # --------------------Visual video processing--------------------
 
         # Videocapturing
         cap = cv2.VideoCapture(f'/mqtt/speed_estimation/temp/{event_id}.mp4')
@@ -225,13 +230,15 @@ class SpeedEstimator:
         fps = int(cap.get(cv2.CAP_PROP_FPS))
 
         # Videowriting
-        directory = f'/storage/{start_time.strftime(r'%d.%m.%Y')}/'
+        start_time_dmy = start_time.strftime(r'%d.%m.%Y')
+        directory = f'/storage/{start_time_dmy}/'
         if not os.path.isdir(directory):
             os.mkdir(directory)
-                
+
         directory_temp = '/mqtt/speed_estimation/temp'
         camera_name = camera.lower().replace('reg', 'r').replace('cam', 'c')
-        filepath = (f'{directory_temp}/{camera_name}_{start_time.strftime(r'%H.%M.%S')}'
+        start_time_hms = start_time.strftime(r'%H.%M.%S')
+        filepath = (f'{directory_temp}/{camera_name}_{start_time_hms}'
                     f'_ср_{median_speed}кмч_{max_detected_speed}кмч.mp4')
         out = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
 
@@ -247,11 +254,13 @@ class SpeedEstimator:
                 bounding_box, stable_frame, speed, score = bsss_item.pop()
                 if stable_frame is True:
                     # Draw detections on the frame
-                    detected_img = draw_external_detection(detected_img, np.array(bounding_box).astype('int'), score)
+                    detected_img = draw_external_detection(
+                        detected_img, np.array(bounding_box).astype('int'), score)
 
                     # Draw speed caption on the frame
-                    detected_img = draw_speed_caption(detected_img, np.array(bounding_box).astype('int'), id, speed)
-            
+                    detected_img = draw_speed_caption(
+                        detected_img, np.array(bounding_box).astype('int'), id, speed)
+
             # Show frame
             cv2.imshow('stream', detected_img)
             if cv2.waitKey(1) & 0xFF == ord('q'):
