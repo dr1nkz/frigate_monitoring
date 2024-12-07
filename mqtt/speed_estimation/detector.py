@@ -25,6 +25,141 @@ class Detections:
                           class_id=self.class_id, tracker_id=self.tracker_id)
 
 
+@dataclass
+class BboxesStableframesSpeedsScores:
+    bounding_boxes: list
+    stable_frames: list
+    speeds: list
+    scores: list
+
+    def __len__(self):
+        return len(self.stable_frames)
+    
+    def hampel_with_outliers_replacing(self):
+        """
+        Hampel filter with outliers replacing
+        """
+        # Hampel filter (outlier -> np.nan)
+        vals = np.array(self.speeds).copy()
+        difference = np.abs(np.median(vals)-vals)
+        median_abs_deviation = np.median(difference)
+        threshold = 3 * median_abs_deviation
+        outlier_idx = (difference > threshold) & (vals > np.median(vals))
+        vals[outlier_idx] = np.nan
+
+        # Nan replacing with average
+        nan_indices = np.isnan(vals)
+        for i in np.where(nan_indices)[0]:
+            # Получаем предыдущие и последующие значения
+            prev_value = vals[i - 1] if i - 1 >= 0 else np.nan
+            next_value = vals[i + 1] if i + 1 < vals.shape[0] else np.nan
+
+            # Вычисляем среднее, игнорируя NaN
+            avg = np.nanmean([prev_value, next_value])
+            vals[i] = avg
+
+        self.speeds = vals.tolist()
+        return(self.speeds)
+
+
+    def pop(self):
+        """
+        Pop left element in dataclass
+        """
+        if self.__len__() > 0 and self.stable_frames[0] is True:
+            bounding_box = self.bounding_boxes[0]
+            self.bounding_boxes = self.bounding_boxes[1:]
+            stable_frame = self.stable_frames[0]
+            self.stable_frames = self.stable_frames[1:]
+            speed = self.speeds[0]
+            self.speeds = self.speeds[1:]
+            score = self.scores[0]
+            self.scores = self.scores[1:]
+        else:
+            if self.__len__() > 0:
+                stable_frame = self.stable_frames[0]
+                self.stable_frames = self.stable_frames[1:]
+            else:
+                stable_frame = False
+            bounding_box, speed, score = None, None, None
+
+        return bounding_box, stable_frame, speed, score
+
+
+def draw_external_detection(image, bounding_box, score):
+    """
+    Нанесение прямоугольников извне
+    """
+    # classes = get_labelmap()
+
+    classes = {
+        0: 'forklift',
+        1: 'cabledrum'
+    }
+
+    class_names = list(classes.values())
+    # class_names = ['person']
+    rng = np.random.default_rng(3)
+    colors = rng.uniform(0, 255, size=(len(class_names), 3))
+
+    # Прямоугольники
+    color = colors[0]
+
+    x_1, y_1, x_2, y_2 = bounding_box.astype(int)
+
+    # Прямоугольник
+    cv2.rectangle(image, (x_1, y_1), (x_2, y_2), color, 2)
+
+    caption = f'{int(score * 100)}%'
+
+    # font
+    font = cv2.FONT_HERSHEY_SIMPLEX
+
+    # fontScale
+    fontScale = 1
+
+    # Line thickness of 2 px
+    thickness = 2
+
+    background_color = (254, 254, 254)
+    (_, text_height), baseline = cv2.getTextSize(
+        caption, font, fontScale, thickness)
+    # cv2.rectangle(image, (x_1, y_1-32), (x_2, y_1),
+    #               (254, 254, 254), -1)
+    x, y = x_1, y_1 - 4 * thickness
+    cv2.rectangle(image, (x, y - text_height), (x_2, y + int(baseline/2)),
+                  background_color, thickness=cv2.FILLED)
+
+    # Using cv2.putText() method
+    cv2.putText(image, caption, (x, y), font,
+                fontScale, color, thickness, cv2.LINE_AA)
+
+    return image
+
+
+def draw_speed_caption(image, bounding_box, tracker_id, speed):
+    # Caption on the frame
+    caption = f'#{tracker_id} {speed} km/h'  # caption
+    font = cv2.FONT_HERSHEY_SIMPLEX  # font
+    fontScale = 1  # fontScale
+    thickness = 2  # Line thickness of 2 px
+    x_1 = bounding_box[0]
+    y_1 = bounding_box[1]
+    x_2 = bounding_box[2]
+    y_2 = bounding_box[3]
+
+    x, y = int(x_1) + 70, int(y_1 - 4 * thickness)
+    (text_width, text_height), baseline = cv2.getTextSize(
+        caption, font, fontScale, thickness)
+    background_color = (254, 254, 254)
+    cv2.rectangle(image, (x, y - text_height), (x + text_width, y + int(baseline/2)),
+                  background_color, thickness=cv2.FILLED)
+    cv2.putText(image, caption, (x, y), font,
+                fontScale, (255, 0, 0), thickness, cv2.LINE_AA)
+
+    return image
+
+
 class YOLOv8:
     """
     Модель YOLO, преобразованная в onnx формат
@@ -164,86 +299,8 @@ class YOLOv8:
         classes = get_labelmap()
 
         # classes = {
-        #     0: 'person',
-        #     1: 'bicycle',
-        #     2: 'car',
-        #     3: 'motorcycle',
-        #     4: 'airplane',
-        #     5: 'bus',
-        #     6: 'train',
-        #     7: 'truck',
-        #     8: 'boat',
-        #     9: 'traffic light',
-        #     10: 'fire hydrant',
-        #     11: 'stop sign',
-        #     12: 'parking meter',
-        #     13: 'bench',
-        #     14: 'bird',
-        #     15: 'cat',
-        #     16: 'dog',
-        #     17: 'horse',
-        #     18: 'sheep',
-        #     19: 'cow',
-        #     20: 'elephant',
-        #     21: 'bear',
-        #     22: 'zebra',
-        #     23: 'giraffe',
-        #     24: 'backpack',
-        #     25: 'umbrella',
-        #     26: 'handbag',
-        #     27: 'tie',
-        #     28: 'suitcase',
-        #     29: 'frisbee',
-        #     30: 'skis',
-        #     31: 'snowboard',
-        #     32: 'sports ball',
-        #     33: 'kite',
-        #     34: 'baseball bat',
-        #     35: 'baseball glove',
-        #     36: 'skateboard',
-        #     37: 'surfboard',
-        #     38: 'tennis racket',
-        #     39: 'bottle',
-        #     40: 'wine glass',
-        #     41: 'cup',
-        #     42: 'fork',
-        #     43: 'knife',
-        #     44: 'spoon',
-        #     45: 'bowl',
-        #     46: 'banana',
-        #     47: 'apple',
-        #     48: 'sandwich',
-        #     49: 'orange',
-        #     50: 'broccoli',
-        #     51: 'carrot',
-        #     52: 'hot dog',
-        #     53: 'pizza',
-        #     54: 'donut',
-        #     55: 'cake',
-        #     56: 'chair',
-        #     57: 'couch',
-        #     58: 'potted plant',
-        #     59: 'bed',
-        #     60: 'dining table',
-        #     61: 'toilet',
-        #     62: 'tv',
-        #     63: 'laptop',
-        #     64: 'mouse',
-        #     65: 'remote',
-        #     66: 'keyboard',
-        #     67: 'cell phone',
-        #     68: 'microwave',
-        #     69: 'oven',
-        #     70: 'toaster',
-        #     71: 'sink',
-        #     72: 'refrigerator',
-        #     73: 'book',
-        #     74: 'clock',
-        #     75: 'vase',
-        #     76: 'scissors',
-        #     77: 'teddy bear',
-        #     78: 'hair drier',
-        #     79: 'toothbrush'
+        #     0: 'forklift',
+        #     1: 'cabledrum'
         # }
 
         class_names = list(classes.values())

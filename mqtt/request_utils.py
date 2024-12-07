@@ -327,18 +327,16 @@ def get_labelmap():
     return labelmap
 
 
-def codec_change(directory: str, filepath: str, speed: float):
+def codec_change(temp_video: str, destination: str):
     """
     Change codec of the output video
 
     :directory: str - directory to store video with changed codec
     :filename: str - temp video path
-    :filename: float - max detected speed
     """
 
     try:
-        filename = os.path.basename(filepath)
-        filename = filename.replace('.mp4', f'_{speed}кмч.mp4')
-        os.system(f"ffmpeg -i {filepath} {directory}{filename}")
+        filename = os.path.basename(temp_video)
+        os.system(f"ffmpeg -i {temp_video} {destination}{filename}")
     except:
         print(f'Error while changing {filename} video codec')

@@ -10,12 +10,15 @@ import cv2
 import numpy as np
 import supervision as sv
 
-from detector import YOLOv8, Detections
-from view_transformer import view_transformer
-from utils import (
-    deques_equal,
-    hampel
+from detector import (
+    YOLOv8,
+    Detections,
+    BboxesStableframesSpeedsScores,
+    draw_external_detection,
+    draw_speed_caption
 )
+from view_transformer import view_transformer
+from utils import   deques_equal
 from request_utils import (
     get_camera_address_from_config,
     get_end_time,
@@ -52,45 +55,18 @@ class SpeedEstimator:
         :cap: cv2.VideoCapture - VideoCapturing object
         """
 
-        # Get camera address
-        # address = f'rtsp://localhost:8554/{camera}'
-        # address = get_camera_address(camera, login, password)
-        # address = get_camera_address_from_config(camera)
-
         # Download clip of the event
         if not download_event_clip(event_id):
             return
 
         # Videocapturing
-        # cv2.namedWindow('stream', cv2.WINDOW_NORMAL)
         cap = cv2.VideoCapture(f'/mqtt/speed_estimation/temp/{event_id}.mp4')
-        print(cap)
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps = int(cap.get(cv2.CAP_PROP_FPS))
-
-        # Videowriting
         start_time = datetime.now()
-        directory = '/storage/' + start_time.strftime(r'%d.%m.%Y/')
-        if not os.path.isdir(directory):
-            os.mkdir(directory)
-        camera_name = camera.lower().replace('reg', 'r').replace('cam', 'c')
-        directory_temp = '/mqtt/speed_estimation/temp/'
-        filepath = directory_temp + camera_name + \
-            start_time.strftime(r'_%H.%M.%S') + '.mp4'
-
-        out = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
-        print(filepath)
-
-        # Get end time of the event
-        # end_time = get_end_time(event_id)
 
         # For affine transforms
         SOURCE, TARGET = get_transform_points_from_api(camera=camera)
-        if SOURCE is None and TARGET is None and os.path.isfile(filepath):
-            system_time.sleep(1)
-            os.remove(filepath)
+        if SOURCE is None and TARGET is None:
             return
 
         print(f'get_transform_points {SOURCE} {TARGET}')
@@ -107,14 +83,17 @@ class SpeedEstimator:
         # Previous coordinates
         coordinates_previous = None
 
-        # Array of speeds
-        speeds = np.array([])
-
         # Permitted speed to move
         permitted_speed = get_permitted_speed(camera=camera)
 
         # Allowed zones for bboxes
         allowed_zones = get_all_zones_coordinates_from_api(camera)
+
+        # Unstable frames counter
+        unstable_frames_counter = 1
+
+        # Dictionary of BboxStableframesSpeeds
+        bsss_dictionary = defaultdict(lambda: BboxesStableframesSpeedsScores)
 
         print(f'cap.isOpened(): {cap.isOpened()}')
         while cap.isOpened():
@@ -205,79 +184,95 @@ class SpeedEstimator:
 
                     time = len(coordinates[tracker_id]) / fps
                     speed = round(distance / time * 3.6, 2)
-                    speeds = np.append(speeds, speed)
 
-                    # speeds = []
-                    # for i in range(len(coordinates[tracker_id]) - 1):
-                    #     coordinates_start = coordinates[tracker_id][i]
-                    #     coordinates_end = coordinates[tracker_id][i+1]
-                    #     speeds.append(np.sqrt(np.sum((coordinates_start-coordinates_end)**2))/10*fps)
-                    # speed = round(np.array(speeds).mean() * 3.6, 2)
+                     # bsss dictionary data append
+                    if bsss_dictionary.get(tracker_id) is None:
+                        bsss_dictionary[tracker_id] = BboxesStableframesSpeedsScores([], [], [], [])
+                        bsss_dictionary[tracker_id].stable_frames.extend(unstable_frames_counter*[False])
 
-                    # max_detected_speed = np.max([max_detected_speed, speed])
+                    bsss_dictionary[tracker_id].bounding_boxes.append(bounding_box)
+                    bsss_dictionary[tracker_id].stable_frames[-1] = True
+                    bsss_dictionary[tracker_id].speeds.append(speed)
+                    bsss_dictionary[tracker_id].scores.append(score)
 
-                    # if (max_detected_speed > permitted_speed):
-                    #     set_retain_to_true(event_id)
-                    #     set_sub_label(
-                    #         event_id, f'Max speed: {max_detected_speed} km/h')
-
-                    # Caption on the frame
-                    caption = f'#{tracker_id} {speed} km/h'  # caption
-                    font = cv2.FONT_HERSHEY_SIMPLEX  # font
-                    fontScale = 1  # fontScale
-                    thickness = 2  # Line thickness of 2 px
-                    x_1 = bounding_box[0]
-                    y_1 = bounding_box[1]
-                    x_2 = bounding_box[2]
-                    y_2 = bounding_box[3]
-                    # Using cv2.putText() method
-                    # cv2.putText(detected_img, caption, (int(x_1 + 2), int(y_1 + (y_2 - y_1) / 2)),
-                    #             font, fontScale, (255, 0, 0), thickness, cv2.LINE_AA)
-
-                    x, y = int(x_1) + 70, int(y_1 - 4 * thickness)
-                    (text_width, text_height), baseline = cv2.getTextSize(
-                        caption, font, fontScale, thickness)
-                    background_color = (254, 254, 254)
-                    cv2.rectangle(detected_img, (x, y - text_height), (x + text_width, y + int(baseline/2)),
-                                  background_color, thickness=cv2.FILLED)
-                    cv2.putText(detected_img, caption, (x, y), font,
-                                fontScale, (255, 0, 0), thickness, cv2.LINE_AA)
-
-            # cv2.imshow('stream', detected_img)
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     break
-
-            # Writing frame to file
-            out.write(detected_img)  # frame
-
+            unstable_frames_counter += 1
             end_time = datetime.now()
             if (end_time-start_time).total_seconds() > 300:
                 break
 
-            # Get end time of the event
-            # end_time = get_end_time(event_id)
+        cap.release()        
+        
+        # Speed outliers deleting        
+        max_detected_speed = 0
 
-        # cv2.destroyAllWindows()
+        for id in bsss_dictionary:
+            if len(bsss_dictionary[id].speeds) != 0:
+                max_item_speed = np.max(np.array(bsss_dictionary[id].hampel_with_outliers_replacing()))
+                max_detected_speed = np.max(np.array([max_item_speed, max_detected_speed]))
+
+        median_speed = 0
+        if bsss_dictionary.get(1):
+            median_speed = round(np.median(np.array(bsss_dictionary[1].speeds)), 2)
+
+
+        #--------------------Visual video processing--------------------
+
+        # Videocapturing
+        cap = cv2.VideoCapture(f'/mqtt/speed_estimation/temp/{event_id}.mp4')
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = int(cap.get(cv2.CAP_PROP_FPS))
+
+        # Videowriting
+        directory = f'/storage/{start_time.strftime(r'%d.%m.%Y')}/'
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
+                
+        directory_temp = '/mqtt/speed_estimation/temp'
+        camera_name = camera.lower().replace('reg', 'r').replace('cam', 'c')
+        filepath = (f'{directory_temp}/{camera_name}_{start_time.strftime(r'%H.%M.%S')}'
+                    f'_ср_{median_speed}кмч_{max_detected_speed}кмч.mp4')
+        out = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
+
+        print(filepath)
+        while cap.isOpened():
+            # Кадр с камеры
+            ret, frame = cap.read()
+            if not ret:
+                break
+            detected_img = frame.copy()
+
+            for id, bsss_item in bsss_dictionary.items():
+                bounding_box, stable_frame, speed, score = bsss_item.pop()
+                if stable_frame is True:
+                    # Draw detections on the frame
+                    detected_img = draw_external_detection(detected_img, np.array(bounding_box).astype('int'), score)
+
+                    # Draw speed caption on the frame
+                    detected_img = draw_speed_caption(detected_img, np.array(bounding_box).astype('int'), id, speed)
+            
+            # Show frame
+            cv2.imshow('stream', detected_img)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+            # Writing frame to file
+            out.write(detected_img)  # frame
+
         cap.release()
         out.release()
         delete_event_clip(event_id)
 
-        # Applying Hampel filter for speed array and finding max value
-        if speeds.shape[0] != 0:
-            max_detected_speed = np.nanmax(hampel(speeds))
-        else:
-            max_detected_speed = 0
-
         # Postprocessing
-        if (max_detected_speed < permitted_speed):
-            # pass
-            if os.path.isfile(filepath):
-                system_time.sleep(1)
-                os.remove(filepath)
-        else:
+        if (max_detected_speed >= permitted_speed):
             set_retain_to_true(event_id)
             set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
-            codec_change(directory, filepath, max_detected_speed)
+            codec_change(filepath, directory)
+
+        if os.path.isfile(filepath):
+            system_time.sleep(1)
+            os.remove(filepath)
 
 
 if __name__ == '__main__':
