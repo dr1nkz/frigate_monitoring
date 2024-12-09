@@ -170,6 +170,10 @@ class SpeedEstimator:
                         coordinates[key].clear()
             coordinates_previous = deepcopy(coordinates)
 
+            for id in bsss_dictionary:
+                if len(bsss_dictionary[id].stable_frames) != 0:
+                    bsss_dictionary[tracker_id].stable_frames.append(False)
+
             # Main loop
             for tracker_id, bounding_box, score in zip(detections.tracker_id, bounding_boxes, scores):
                 # wait to have enough data
@@ -243,7 +247,6 @@ class SpeedEstimator:
         out = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
 
         print(filepath)
-        print(bsss_dictionary)
         while cap.isOpened():
             # Кадр с камеры
             ret, frame = cap.read()
