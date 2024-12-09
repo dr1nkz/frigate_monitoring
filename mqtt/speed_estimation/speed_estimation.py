@@ -171,7 +171,7 @@ class SpeedEstimator:
             coordinates_previous = deepcopy(coordinates)
 
             # Main loop
-            for tracker_id, bounding_box in zip(detections.tracker_id, bounding_boxes):
+            for tracker_id, bounding_box, score in zip(detections.tracker_id, bounding_boxes, scores):
                 # wait to have enough data
                 if len(coordinates[tracker_id]) > fps / 2:
                     # calculate the speed
