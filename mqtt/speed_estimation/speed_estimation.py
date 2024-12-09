@@ -243,6 +243,7 @@ class SpeedEstimator:
         out = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
 
         print(filepath)
+        print(bsss_dictionary)
         while cap.isOpened():
             # Кадр с камеры
             ret, frame = cap.read()
