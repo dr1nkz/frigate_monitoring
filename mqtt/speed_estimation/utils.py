@@ -129,3 +129,23 @@ def hampel(vals_orig):
     outlier_idx = (difference > threshold) & (vals > np.median(vals))
     vals[outlier_idx] = np.nan
     return(vals)
+
+
+def check_consecutive_exceeds(speeds, permitted_speed, violation_frames_count):
+    """
+    Проверка на длительность нарушения скорости
+    """
+    # consecutive frames counter
+    consecutive = 0
+    
+    # Проходим по списку
+    for num in speeds:
+        if num > permitted_speed:
+            consecutive += 1
+            # Если подряд идет нужное количество значений
+            if consecutive >= violation_frames_count:
+                return True
+        else:
+            consecutive = 0  # сбрасываем счетчик, если условие не выполнено
+    
+    return False

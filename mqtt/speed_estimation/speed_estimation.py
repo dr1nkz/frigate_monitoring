@@ -18,7 +18,7 @@ from detector import (
     draw_speed_caption
 )
 from view_transformer import view_transformer
-from utils import deques_equal
+from utils import deques_equal, check_consecutive_exceeds
 from request_utils import (
     get_camera_address_from_config,
     get_end_time,
@@ -31,6 +31,9 @@ from request_utils import (
     delete_event_clip,
     codec_change
 )
+
+
+VIOLATION_DURATION = int(os.getenv('VIOLATION_DURATION', 3))
 
 
 class SpeedEstimator:
@@ -212,6 +215,7 @@ class SpeedEstimator:
         # Speed outliers deleting
         id_of_max_speed = 1
         max_detected_speed = 0
+        violation_registration = False
 
         for id in bsss_dictionary:
             if len(bsss_dictionary[id].speeds) != 0:
@@ -220,11 +224,19 @@ class SpeedEstimator:
                 if max_item_speed > max_detected_speed:
                     max_detected_speed = max_item_speed
                     id_of_max_speed = id
+                violation_registration = violation_registration or check_consecutive_exceeds(bsss_dictionary[id].speeds, permitted_speed, VIOLATION_DURATION*fps)
 
+        # Calculating median
         median_speed = 0
         if bsss_dictionary.get(id_of_max_speed):
             median_speed = round(
                 np.median(np.array(bsss_dictionary[id_of_max_speed].speeds)), 2)
+
+        # Check if there are consecutive frames for VIOLATION_DURATION with violation
+        # if no - return, if yes - visual video processing
+        if not violation_registration:
+            delete_event_clip(event_id)
+            return
 
         # --------------------Visual video processing--------------------
 
@@ -275,10 +287,9 @@ class SpeedEstimator:
         delete_event_clip(event_id)
 
         # Postprocessing
-        if (max_detected_speed >= permitted_speed):
-            set_retain_to_true(event_id)
-            set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
-            codec_change(filepath, directory)
+        set_retain_to_true(event_id)
+        set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
+        codec_change(filepath, directory)
 
         if os.path.isfile(filepath):
             system_time.sleep(1)
