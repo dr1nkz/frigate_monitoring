@@ -234,6 +234,7 @@ class SpeedEstimator:
 
         # Check if there are consecutive frames for VIOLATION_DURATION with violation
         # if no - return, if yes - visual video processing
+        print(f'Violation_registration: {violation_registration}')
         if not violation_registration:
             delete_event_clip(event_id)
             return
