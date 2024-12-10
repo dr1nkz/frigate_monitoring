@@ -238,6 +238,27 @@ def get_transform_points_from_api(camera: str):
     return source, target
 
 
+def get_distortion_coefficients(camera: str):
+    """
+    Get distortion coefficients for camera
+
+    :camera: str - camera name
+    :return: np.array(int) - distortion coefficients for camera
+    """
+    try:
+        with open('speed_estimation/transform_points.json') as file:
+            distortion_coefficients = json.loads(file.read())
+        
+        CAMERA_MATRIX = np.array(distortion_coefficients[camera]['CAMERA_MATRIX'])
+        DISTORTION_COEFFICIENTS = np.array(distortion_coefficients[camera]['DISTORTION_COEFFICIENTS'])
+    except:
+        print(f'No distortion coefficients for camera \'{camera}\'')
+        CAMERA_MATRIX = None
+        DISTORTION_COEFFICIENTS = None
+
+    return CAMERA_MATRIX, DISTORTION_COEFFICIENTS
+
+
 def get_permitted_speed(camera: str):
     """
     Get permitted speed for camera
