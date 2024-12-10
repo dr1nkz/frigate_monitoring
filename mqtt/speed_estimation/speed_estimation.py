@@ -210,19 +210,21 @@ class SpeedEstimator:
         cap.release()
 
         # Speed outliers deleting
+        id_of_max_speed = 1
         max_detected_speed = 0
 
         for id in bsss_dictionary:
             if len(bsss_dictionary[id].speeds) != 0:
                 max_item_speed = np.max(
                     np.array(bsss_dictionary[id].hampel_with_outliers_replacing()))
-                max_detected_speed = np.max(
-                    np.array([max_item_speed, max_detected_speed]))
+                if max_item_speed > max_detected_speed:
+                    max_detected_speed = max_item_speed
+                    id_of_max_speed = id
 
         median_speed = 0
-        if bsss_dictionary.get(1):
+        if bsss_dictionary.get(id_of_max_speed):
             median_speed = round(
-                np.median(np.array(bsss_dictionary[1].speeds)), 2)
+                np.median(np.array(bsss_dictionary[id_of_max_speed].speeds)), 2)
 
         # --------------------Visual video processing--------------------
 
