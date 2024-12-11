@@ -358,6 +358,22 @@ def codec_change(temp_video: str, destination: str):
 
     try:
         filename = os.path.basename(temp_video)
-        os.system(f"ffmpeg -i {temp_video} {destination}{filename}")
+        index = get_index(destination)
+        os.system(f"ffmpeg -i {temp_video} {destination}{index}_{filename}")
     except:
         print(f'Error while changing {filename} video codec')
+
+
+def get_index(destination:str=None):
+    """
+    Compute the index for file with estimated speed
+
+    :destination: str - directory where videos store
+    """
+    try:
+        files = os.listdir(destination)
+        index = max(int(file.split('_')[0]) for file in files) + 1
+    except:
+        index = 1
+
+    return index
