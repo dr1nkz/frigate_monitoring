@@ -1,6 +1,5 @@
 # config/db.py
 storage/recordings
-test.ipynb
 *.jpg
 *.mp4
 mqtt/__pycache__
