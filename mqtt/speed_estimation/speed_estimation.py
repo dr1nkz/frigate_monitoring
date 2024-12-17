@@ -219,7 +219,7 @@ class SpeedEstimator:
 
         for id in bsss_dictionary:
             if len(bsss_dictionary[id].speeds) != 0:
-                max_item_speed = np.max(
+                max_item_speed = np.nanmax(
                     np.array(bsss_dictionary[id].hampel_with_outliers_replacing()))
                 if max_item_speed > max_detected_speed:
                     max_detected_speed = max_item_speed
@@ -230,7 +230,7 @@ class SpeedEstimator:
         median_speed = 0
         if bsss_dictionary.get(id_of_max_speed):
             median_speed = round(
-                np.median(np.array(bsss_dictionary[id_of_max_speed].speeds)), 2)
+                np.nanmedian(np.array(bsss_dictionary[id_of_max_speed].speeds)), 2)
 
         # Check if there are consecutive frames for VIOLATION_DURATION with violation
         # if no - return, if yes - visual video processing
