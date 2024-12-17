@@ -149,11 +149,8 @@ detectors:
     type: openvino
     device: GPU
     model:
-      path: /config/forklift_cabledrum_model/forklift_cabledrum_model.xml
-      # path: /config/forklift_model_new/forklift_model_new.xml
-      # path: /config/clips_model/clips_model.xml
-      # path: /config/clips_model_v2/clips_model_v2.xml
-      # path: /config/clips_model_9s/clips_model_9s.xml
+      # path: /config/forklift_cabledrum_model/forklift_cabledrum_model.xml
+      path: /config/forklift_cabledrum_model_v2/forklift_cabledrum_model_v2.xml
 
 model:
   width: 640
@@ -161,12 +158,8 @@ model:
   input_tensor: nchw
   input_pixel_format: bgr
   model_type: yolov8
-  labelmap_path: /config/forklift_cabledrum_model/forklift_cabledrum_model_labelmap.txt
-  # labelmap_path: /config/forklift_model_new/forklift_model_new.txt
-  # labelmap_path: /config/clips_model/clips_model_labelmap.txt
-  # labelmap_path: /config/clips_model_v2/clips_model_v2_labelmap.txt
-  # labelmap_path: /config/clips_model_9s/clips_model_9s_labelmap.txt
-
+  # labelmap_path: /config/forklift_cabledrum_model/forklift_cabledrum_model_labelmap.txt
+  labelmap_path: /config/forklift_cabledrum_model_v2/forklift_cabledrum_model_v2_labelmap.txt
 
 # detectors:
 #   tensorrt:
