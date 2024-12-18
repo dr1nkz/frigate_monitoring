@@ -34,7 +34,7 @@ class BboxesStableframesSpeedsScores:
 
     def __len__(self):
         return len(self.stable_frames)
-    
+
     def hampel_with_outliers_replacing(self):
         """
         Hampel filter with outliers replacing
@@ -55,12 +55,11 @@ class BboxesStableframesSpeedsScores:
             next_value = vals[i + 1] if i + 1 < vals.shape[0] else np.nan
 
             # Вычисляем среднее, игнорируя NaN
-            avg = np.nanmean([prev_value, next_value])
+            avg = round(np.nanmean([prev_value, next_value]), 2)
             vals[i] = avg
 
         self.speeds = vals.tolist()
-        return(self.speeds)
-
+        return (self.speeds)
 
     def pop(self):
         """
