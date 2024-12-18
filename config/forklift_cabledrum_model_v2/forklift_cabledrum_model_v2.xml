@@ -27841,7 +27841,7 @@
 		<framework>
 			<author value="Ultralytics" />
 			<batch value="1" />
-			<date value="2024-12-16T23:06:41.206493" />
+			<date value="2024-12-18T00:17:21.098881" />
 			<description value="Ultralytics YOLOv9c model trained on ./dataset_december.yaml" />
 			<docs value="https://docs.ultralytics.com" />
 			<imgsz value="[640, 640]" />
