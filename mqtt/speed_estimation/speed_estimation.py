@@ -110,9 +110,9 @@ class SpeedEstimator:
             bounding_boxes, scores, class_ids = self.yolov8_detector(
                 detected_img)
             # print(bounding_boxes)
-            bounding_boxes = np.array(bounding_boxes)[class_ids == 1]
-            scores = np.array(scores)[class_ids == 1]
-            class_ids = np.array(class_ids)[class_ids == 1]
+            bounding_boxes = np.array(bounding_boxes)[class_ids == 0]
+            scores = np.array(scores)[class_ids == 0]
+            class_ids = np.array(class_ids)[class_ids == 0]
             detected_img = self.yolov8_detector.draw_detections(detected_img)
             if detected_img is None:
                 continue
