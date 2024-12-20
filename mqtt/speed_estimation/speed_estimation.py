@@ -174,8 +174,8 @@ class SpeedEstimator:
             coordinates_previous = deepcopy(coordinates)
 
             for id in bsss_dictionary:
-                if bsss_dictionary.get(tracker_id) is not None:
-                    bsss_dictionary[tracker_id].stable_frames.append(False)
+                if bsss_dictionary.get(id) is not None:
+                    bsss_dictionary[id].stable_frames.append(False)
 
             # Main loop
             for tracker_id, bounding_box, score in zip(detections.tracker_id, bounding_boxes, scores):
