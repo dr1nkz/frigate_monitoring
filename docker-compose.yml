@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     build: ./mqtt
     environment:
-      - PYTHONPATH=/mqtt/speed_estimation
+      - PYTHONPATH="/mqtt/speed_estimation:/mqtt/speed_estimation/tg_bot:$PYTHONPATH"
       # - PYTHONPATH=/mqtt
     command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
     volumes:

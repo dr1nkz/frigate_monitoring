@@ -2,15 +2,23 @@ import asyncio
 import logging
 import sys
 from os import getenv
-import aiogram.filters
-from dotenv import load_dotenv
+import multiprocessing
 
+
+from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.types import Message
 from aiogram.filters import CommandStart, Command
+
+
 from db import Database
+
+
+import paho.mqtt.client as mqtt
+import json
+import requests
 
 
 # Bot token can be obtained via https://t.me/BotFather
@@ -21,6 +29,7 @@ TOKEN = getenv('BOT_TOKEN')
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 db = Database('users_database.db')
+processes = []
 
 
 @dp.message(CommandStart())
@@ -111,8 +120,92 @@ async def main() -> None:
     #     parse_mode=ParseMode.HTML))
     # And the run events dispatching
     await dp.start_polling(bot)
+    # dp.start_polling(bot)
+
+
+def on_connect(client, userdata, flags, reason_code, properties):
+    """
+    The callback for when the client receives a CONNACK response from the server.
+    """
+    print(f"Connected with result code {reason_code}")
+    # Subscribing in on_connect()
+    client.subscribe("frigate/events")
+
+# def on_connect(client, userdata, flags, reason_code, properties):
+#     """
+#     The callback for when the client receives a CONNACK response from the server.
+#     """
+#     print(f"Connected with result code {reason_code}")
+#     # Subscribing in on_connect()
+#     client.subscribe("frigate/events")
+
+
+def on_message(client, userdata, msg):
+    """
+    The callback for when a PUBLISH message is received from the server.
+    """
+    if (msg.topic == 'frigate/events'):
+        payload = json.loads(str(msg.payload)[2:-1])
+
+        # Required alues from payload
+        event_id = payload["after"]["id"]
+        start_time = payload["after"]["start_time"]
+        end_time = payload["after"]["end_time"]
+        label = payload["after"]["label"]
+        camera = payload["after"]["camera"]
+        entered_zones = payload["after"]["entered_zones"]
+        sub_label = payload["after"]["sub_label"]
+
+        print(f'{msg.topic} {event_id} {start_time} {end_time} \
+        {label} {camera} {entered_zones}')
+
+    else:
+        print(msg.topic+" "+str(msg.payload))
+
+    if end_time is None:
+        # event_ids.remove(event_id)
+        process = multiprocessing.Process(target=run_speed_estimation)
+        process.start()
+        processes.append(process)
+
+
+async def run_speed_estimation():  # cap: cv2.VideoCapture
+    """
+    Invoke speed estimation process
+
+    :camera: str - camera name
+    :event_id: str - id of the event
+    :permitted_speed: int - permitted speed to move
+    """
+    # subprocess.call(['python3', f'speed_estimation/speed_estimation.py',
+    #                  camera, event_id, f'{permitted_speed}'])
+    # speed_estimator(camera, event_id, permitted_speed, cap)
+    my_db = Database('users_database.db')
+    my_bot = Bot(token=TOKEN, default=DefaultBotProperties(
+        parse_mode=ParseMode.HTML))
+    users = my_db.get_all_users()
+    for user in users:
+        await my_bot.send_message(user[0], 'run_speed_estimation')
+
 
 # Теперь вызываем asyncio.run() здесь, вне всех остальных функций
 if __name__ == "__main__":
+    # multiprocessing.set_start_method('spawn')
+    # process = multiprocessing.Process(target=main)
+    # process.start()
+
+    mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    mqttc.on_connect = on_connect
+    mqttc.on_message = on_message
+
+    # mqttc.connect("nanomq", 1883, 60)
+    mqttc.connect("192.168.16.70", 1883, 60)
+
+    # Blocking call that processes network traffic, dispatches callbacks and
+    # handles reconnecting.
+    # Other loop*() functions are available that give a threaded interface and a
+    # manual interface.
+    mqttc.loop_start()
+
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())
