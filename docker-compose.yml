@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     build: ./mqtt
     environment:
-      - PYTHONPATH="/mqtt/speed_estimation:/mqtt/speed_estimation/tg_bot:$PYTHONPATH"
+      - PYTHONPATH="/mqtt/speed_estimation"
       # - PYTHONPATH=/mqtt
     command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
     volumes:
@@ -30,3 +30,47 @@ services:
       # - ./filebrowser/.filebrowser.json:/.filebrowser.json
     ports:
       - 80:80
+
+  tg_bot:
+    container_name: tg_bot
+    restart: unless-stopped
+    build: ./tg_bot
+    environment:
+      - PYTHONPATH="tg_bot"
+    command: [ "python3", "/tg_bot/bot.py" ]
+    volumes:
+      - ./tg_bot:/tg_bot
+      - /etc/localtime:/etc/localtime
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: postgres_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    # ports:
+    #   - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
+
+    command: >
+      postgres -c max_connections=1000
+               -c shared_buffers=256MB
+               -c effective_cache_size=768MB
+               -c maintenance_work_mem=64MB
+               -c checkpoint_completion_target=0.7
+               -c wal_buffers=16MB
+               -c default_statistics_target=100
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres_user -d postgres_db" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+
+volumes:
+  pgdata: {}

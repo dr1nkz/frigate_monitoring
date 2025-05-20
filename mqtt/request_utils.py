@@ -5,6 +5,7 @@ import time as system_time
 import json
 import yaml
 import numpy as np
+import psycopg2
 
 
 FRIGATE_ADDRESS = os.getenv('FRIGATE_ADDRESS')
@@ -248,9 +249,11 @@ def get_distortion_coefficients(camera: str):
     try:
         with open('speed_estimation/transform_points.json') as file:
             distortion_coefficients = json.loads(file.read())
-        
-        CAMERA_MATRIX = np.array(distortion_coefficients[camera]['CAMERA_MATRIX'])
-        DISTORTION_COEFFICIENTS = np.array(distortion_coefficients[camera]['DISTORTION_COEFFICIENTS'])
+
+        CAMERA_MATRIX = np.array(
+            distortion_coefficients[camera]['CAMERA_MATRIX'])
+        DISTORTION_COEFFICIENTS = np.array(
+            distortion_coefficients[camera]['DISTORTION_COEFFICIENTS'])
     except:
         print(f'No distortion coefficients for camera \'{camera}\'')
         CAMERA_MATRIX = None
@@ -364,7 +367,7 @@ def codec_change(temp_video: str, destination: str):
         print(f'Error while changing {filename} video codec')
 
 
-def get_index(destination:str=None):
+def get_index(destination: str = None):
     """
     Compute the index for file with estimated speed
 
@@ -377,3 +380,75 @@ def get_index(destination:str=None):
         index = 1
 
     return index
+
+
+def get_thumbnail(event_id: str):
+    """
+    Get thumbnail of the event
+
+    :event_id: str - id of the event
+    :return: bin - end time of the event
+    """
+    url = f'{API_URL}events/{event_id}/thumbnail.jpg'
+    response = requests.get(url=url).text
+
+    try:
+        thumbnail = response
+    except:
+        thumbnail = None
+
+    return thumbnail
+
+
+def insert_event_data(event_id: str, max_speed: float, median_speed: float, event_datetime: str):
+    """
+    Insert_event_data
+
+    :event_id: str - id of event
+    :max_speed: float - max speed of forlift
+    :median_speed: float - median speed of forlift
+    :event_datetime: str - datetime of event
+    :image: bin - thumbnail of event
+    """
+
+    # Параметры подключения
+    host = "postgres_container"      # Имя контейнера PostgreSQL
+    port = 5432                      # Порт PostgreSQL
+    dbname = "postgres_db"           # Имя базы данных
+    user = "postgres_user"           # Пользователь PostgreSQL
+    password = "postgres_password"   # Пароль PostgreSQL
+
+    try:
+        # Установить соединение
+        connection = psycopg2.connect(
+            host=host,
+            port=port,
+            dbname=dbname,
+            user=user,
+            password=password
+        )
+
+        cursor = connection.cursor()
+        # Вставка данных
+        query = f"""
+            INSERT INTO events (event_id, max_speed, median_speed, event_datetime, image)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+
+        # Снимок начала события
+        thumbnail = get_thumbnail(event_id)
+
+        cursor.execute(query, (event_id, max_speed,
+                       median_speed, event_datetime, thumbnail))
+
+        # Сохранить изменения и закрыть соединение
+        connection.commit()
+        cursor.close()
+        print(f"Данные события {event_id} успешно добавлены в таблицу events")
+
+    except Exception as e:
+        print(f"Ошибка подключения: {e}")
+
+    finally:
+        if 'connection' in locals() and connection:
+            connection.close()

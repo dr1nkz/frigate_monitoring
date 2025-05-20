@@ -1,0 +1,6 @@
+numpy==1.26
+python-dotenv
+requests
+opencv-python
+aiogram
+asyncio
