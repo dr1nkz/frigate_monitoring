@@ -30,13 +30,3 @@ services:
       # - ./filebrowser/.filebrowser.json:/.filebrowser.json
     ports:
       - 80:80
-
-  mqtt_notificator:
-    container_name: mqtt_notificator
-    restart: unless-stopped
-    build: ./mqtt_notificator
-    command: [ "python3", "/mqtt_notificator/demo_script.py" ]
-    volumes:
-      - ./mqtt_notificator:/mqtt_notificator
-      - /etc/localtime:/etc/localtime
-      - ./speed_estimation:/storage
