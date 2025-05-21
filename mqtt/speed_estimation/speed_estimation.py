@@ -29,8 +29,10 @@ from request_utils import (
     get_permitted_speed,
     download_event_clip,
     delete_event_clip,
-    codec_change
+    codec_change,
+    get_index
 )
+from demo_notificator import upload_file_to_s3_and_send_mqtt_message
 
 
 VIOLATION_DURATION = int(os.getenv('VIOLATION_DURATION', 3))
@@ -224,7 +226,8 @@ class SpeedEstimator:
                 if max_item_speed > max_detected_speed:
                     max_detected_speed = max_item_speed
                     id_of_max_speed = id
-                violation_registration = violation_registration or check_consecutive_exceeds(bsss_dictionary[id].speeds, permitted_speed, VIOLATION_DURATION*fps)
+                violation_registration = violation_registration or check_consecutive_exceeds(
+                    bsss_dictionary[id].speeds, permitted_speed, VIOLATION_DURATION*fps)
 
         # Calculating median
         median_speed = 0
@@ -257,8 +260,11 @@ class SpeedEstimator:
         directory_temp = '/mqtt/speed_estimation/temp'
         camera_name = camera.lower().replace('reg', 'r').replace('cam', 'c')
         start_time_hms = start_time.strftime(r'%H.%M.%S')
-        filepath = (f'{directory_temp}/{camera_name}_{start_time_hms}'
+        duration = (end_time - start_time).total_seconds()
+        end_time_hms = end_time.strftime(r'%H.%M.%S')
+        filename = (f'{camera_name}_{start_time_hms}'
                     f'_ср_{median_speed}кмч_{max_detected_speed}кмч.mp4')
+        filepath = f'{directory_temp}/{filename}'
         out = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
 
         print(filepath)
@@ -291,6 +297,15 @@ class SpeedEstimator:
         set_retain_to_true(event_id)
         set_sub_label(event_id, f'Max speed: {max_detected_speed} km/h')
         codec_change(filepath, directory)
+        # Upload_file_to_s3_and_send_mqtt_message
+        index = get_index(directory) - 1
+        index = index if index != 0 else 1
+        filename = f'{index}_{filename}'
+        try:
+            upload_file_to_s3_and_send_mqtt_message(filename, directory, start_time_hms, end_time_hms,
+                                                    median_speed, max_detected_speed, duration)
+        except Exception as e:
+            print(f"Произошла ошибка: {e}")
 
         if os.path.isfile(filepath):
             system_time.sleep(1)

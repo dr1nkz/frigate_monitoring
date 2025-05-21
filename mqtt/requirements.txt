@@ -10,3 +10,4 @@ onnxruntime-gpu==1.18.0
 pyyaml
 shapely
 supervision
+boto3
