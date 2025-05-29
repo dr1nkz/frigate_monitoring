@@ -50,7 +50,7 @@ def send_mqtt_message(filename, start_time, end_time, median_speed, max_detected
     }
 
     # Отправляем в MQTT
-    client = mqtt.Client()
+    client = mqtt.Client(callback_api_version=5)
     client.connect(MQTT_BROKER, MQTT_PORT, 60)
     client.publish(MQTT_TOPIC, json.dumps(payload))
     print(payload)
