@@ -57,8 +57,13 @@
         ]
     },
     "Reg06_cam25": {
-        "TARGET_WIDTH": 5.3,
-        "TARGET_HEIGHT": 150,
+        "TARGET_WIDTH": 7.5,
+        "TARGET_HEIGHT": 57.6,
+        "PERMITTED_SPEED": 12
+    },
+    "Reg06_cam10": {
+        "TARGET_WIDTH": 7.5,
+        "TARGET_HEIGHT": 41,
         "PERMITTED_SPEED": 12
     }
 }
