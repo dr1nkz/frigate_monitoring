@@ -1,5 +1,6 @@
 # config/db.py
 storage/recordings
+storage/clips
 test.ipynb
 *.jpg
 *.mp4
@@ -15,3 +16,6 @@ storage/clips/preview_restart_cache
 config/model_cache/tensorrt
 config/backup.db
 config/backup_config.yaml
+config/.exports
+config/.jwt_secret
+config/*.onnx

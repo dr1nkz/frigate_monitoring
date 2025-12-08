@@ -1,23 +1,23 @@
 services:
 
-  nanomq:
-    image: emqx/nanomq:0.18.2-slim
-    container_name: nanomq
-    restart: unless-stopped
-    ports:
-      - 1883:1883
-      - 8083:8083
-      - 8883:8883
-    volumes:
-      - ./nanomq/nanomq.conf:/etc/nanomq.conf
+  # nanomq:
+  #   image: emqx/nanomq:0.18.2-slim
+  #   container_name: nanomq
+  #   restart: unless-stopped
+  #   ports:
+  #     - 1883:1883
+  #     - 8083:8083
+  #     - 8883:8883
+  #   volumes:
+  #     - ./nanomq/nanomq.conf:/etc/nanomq.conf
 
   frigate:
     container_name: frigate
     restart: unless-stopped
-    build: .
+    # build: .
     privileged: true
     shm_size: '192mb'
-    # image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
+    image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
     environment:
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
     # command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
@@ -37,5 +37,12 @@ services:
       - "1984:1984"
       # - "8555:8555/tcp" # WebRTC over tcp
       # - "8555:8555/udp" # WebRTC over udp
-    devices:
-      - "/dev/dri"
+    # devices:
+    #   - "/dev/dri"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['1']
+              capabilities: [ gpu ]

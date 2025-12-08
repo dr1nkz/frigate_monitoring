@@ -85,22 +85,8 @@ detect:
 objects:
   # Optional: list of objects to track from labelmap.txt (default: shown below)
   track:
-    # - person
+    # - cabledrum
     - forklift
-
-    # - каска
-    # - нет-каски
-    # - нет-жилета
-    # - человек
-    # - жилет
-    # - погрузчик
-
-    # - helmet
-    # - no_helmet
-    # - no_vest
-    # - person
-    # - vest
-    # - forklift
   filters:
     person:
       # Optional: minimum width*height of the bounding box for the detected object (default: 0)
@@ -119,66 +105,19 @@ objects:
       # Checks based on the bottom center of the bounding box of the object
       # mask:
       #   - 0,480,341,480,347,0,0,0
-    helmet:
-      # Optional: minimum score for the object to initiate tracking (default: shown below)
-      min_score: 0.5
-      # Optional: minimum decimal percentage for tracked object's computed score to be considered a true positive (default: shown below)
-      threshold: 0.55
-      # mask:
-      #   - 0,480,341,480,347,0,0,0
-    no-helmet:
-      # Optional: minimum score for the object to initiate tracking (default: shown below)
-      min_score: 0.5
-      # Optional: minimum decimal percentage for tracked object's computed score to be considered a true positive (default: shown below)
-      threshold: 0.55
-    no-vest:
-      # Optional: minimum score for the object to initiate tracking (default: shown below)
-      min_score: 0.5
-      # Optional: minimum decimal percentage for tracked object's computed score to be considered a true positive (default: shown below)
-      threshold: 0.55
-    vest:
-      # Optional: minimum score for the object to initiate tracking (default: shown below)
-      min_score: 0.5
-      # Optional: minimum decimal percentage for tracked object's computed score to be considered a true positive (default: shown below)
-      threshold: 0.55
-      # mask:
-      #   - 0,480,341,480,347,0,0,0
 
 detectors:
-  ov:
-    type: openvino
-    device: GPU
-    model:
-      # path: /config/forklift_cabledrum_model/forklift_cabledrum_model.xml
-      path: /config/forklift_cabledrum_model_v2/forklift_cabledrum_model_v2.xml
+  onnx:
+    type: onnx
 
 model:
-  width: 640
-  height: 640
+  model_type: rfdetr
+  width: 576
+  height: 576
   input_tensor: nchw
-  input_pixel_format: bgr
-  model_type: yolov8
-  # labelmap_path: /config/forklift_cabledrum_model/forklift_cabledrum_model_labelmap.txt
-  labelmap_path: /config/forklift_cabledrum_model_v2/forklift_cabledrum_model_v2_labelmap.txt
-
-# detectors:
-#   tensorrt:
-#     type: tensorrt
-#     device: 0 #This is the default, select the first GPU
-
-# model:
-#   path: /config/model_cache/tensorrt/yolov7-640.trt
-#   input_tensor: nchw
-#   input_pixel_format: rgb
-#   width: 640
-#   height: 640
-
-
-# detectors:
-#   deepstack:
-#     api_url: http://codeproject-ai-server-cuda:32168/v1/vision/detection/custom
-#     type: deepstack
-#     api_timeout: 1 # seconds
+  input_dtype: float
+  path: /config/forklifts_rfdetr_v1.onnx
+  labelmap_path: /config/forklifts_rfdetr_v1_labelmap.txt
 
 
 record:
@@ -192,18 +131,6 @@ record:
   # Optional: Sync recordings with disk on startup and once a day (default: shown below).
   sync_recordings: false
   # Optional: Retention settings for recording
-  retain:
-    # Optional: Number of days to retain recordings regardless of events (default: shown below)
-    # NOTE: This should be set to 0 and retention should be defined in events section below
-    #       if you only want to retain recordings of events.
-    days: 0
-    # Optional: Mode for retention. Available options are: all, motion, and active_objects
-    #   all - save all recording segments regardless of activity
-    #   motion - save all recordings segments with any detected motion
-    #   active_objects - save all recording segments with active/moving objects
-    # NOTE: this mode only applies when the days setting above is greater than 0
-    mode: all
-  # Optional: Recording Export Settings
   export:
     # Optional: Timelapse Output Args (default: shown below).
     # NOTE: The default args are set to fit 24 hours of recording into 1 hour playback.
@@ -214,55 +141,26 @@ record:
     # So the args would be -vf setpts=0.02*PTS -r 30 in that case.
     timelapse_args: -vf setpts=0.04*PTS -r 30
   # Optional: Event recording settings
-  events:
-    # Optional: Number of seconds before the event to include (default: shown below)
+  alerts:
+    retain: {}
     pre_capture: 5
-    # Optional: Number of seconds after the event to include (default: shown below)
     post_capture: 5
-    # Optional: Objects to save recordings for. (default: all tracked objects)
-    # objects:
-    #   - person
-    # Optional: Restrict recordings to objects that entered any of the listed zones (default: no required zones)
-    # required_zones: []
-    # Optional: Retention settings for recordings of events
-    retain:
-      # Required: Default retention days (default: shown below)
-      default: 0
-      # Optional: Mode for retention. (default: shown below)
-      #   all - save all recording segments for events regardless of activity
-      #   motion - save all recordings segments for events with any detected motion
-      #   active_objects - save all recording segments for event with active/moving objects
-      #
-      # NOTE: If the retain mode for the camera is more restrictive than the mode configured
-      #       here, the segments will already be gone by the time this mode is applied.
-      #       For example, if the camera retain mode is "motion", the segments without motion are
-      #       never stored, so setting the mode to "all" here won't bring them back.
-      mode: motion
-      # Optional: Per object retention days
-      # objects:
-      #   person: 15
+  detections:
+    retain: {}
+    pre_capture: 5
+    post_capture: 5
 
 cameras:
   Reg13_cam19:
     enabled: true
-
     ffmpeg:
-      hwaccel_args: preset-vaapi
+      hwaccel_args: preset-nvidia-h264
       inputs:
-        # - path: rtsp://admin:admin@192.168.0.39:1935
-        # # - path: http://192.168.0.39:8080/video
-        # #   input_args: -re -stream_loop -1 -fflags +genpts
-        #   roles:
-        #     - detect
-        #     - record
-
-      - path: 
-          rtsp://192.168.11.2:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
-        # - path: rtsp://mediamtx-server:8554/stream0.sdp
-          # input_args: preset-rtsp-restream
-        roles:
-        - record
-        - detect
+        - path: 
+            rtsp://192.168.11.2:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
+          roles:
+            - record
+            - detect
 
     zones:
       zone_0:
@@ -278,102 +176,107 @@ cameras:
       filters:
         forklift:
           mask:
-          - 349,0,123,101,1043,365,1061,445
+            - 349,0,123,101,1043,365,1061,445
 
 
-  Reg05_cam32:
-    enabled: true
-
-    ffmpeg:
-      hwaccel_args: preset-vaapi
-      inputs:
-      - path: rtsp://admin:Zse45rdx@192.168.71.178:554/ISAPI/Streaming/Channels/01
-        roles:
-        - record
-        - detect
-
-    zones:
-      zone_0:
-        coordinates: 810,918,447,1039,410,117,444,110
-      zone_1:
-        coordinates: 423,1080,1250,1080,490,197,401,215
-      zone_2:
-        coordinates: 408,343,527,1080,0,1080,97,403
-      zone_3:
-        coordinates: 1621,411,1920,573,1220,1080,866,709
-
-
-  # Reg02_cam13:
+  # Reg05_cam32:
   #   enabled: true
 
   #   ffmpeg:
-  #     hwaccel_args: preset-vaapi
+  #     hwaccel_args: preset-nvidia-h264
   #     inputs:
-  #     - path: rtsp://admin:Zse45rdx@192.168.11.36:554/ISAPI/Streaming/Channels/01
-  #       roles:
-  #       - record
-  #       - detect
+  #       - path: 
+  #           rtsp://admin:Zse45rdx@192.168.71.178:554/ISAPI/Streaming/Channels/01
+  #         roles:
+  #           - record
+  #           - detect
 
   #   zones:
   #     zone_0:
-  #       coordinates: 1754,194,1852,227,550,989,120,587
+  #       coordinates: 810,918,447,1039,410,117,444,110
   #     zone_1:
-  #       coordinates: 750,983,1837,246,1738,210,0,679
+  #       coordinates: 423,1080,1250,1080,490,197,401,215
   #     zone_2:
-  #       coordinates: 0,1080,801,1080,786,912,0,659
+  #       coordinates: 408,343,527,1080,0,1080,97,403
+  #     zone_3:
+  #       coordinates: 1621,411,1920,573,1220,1080,866,709
 
 
-  Reg04_cam07:
-    enabled: true
+  # # Reg02_cam13:
+  # #   enabled: true
 
-    ffmpeg:
-      hwaccel_args: preset-vaapi
-      inputs:
-      - path: rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
-        roles:
-        - record
-        - detect
-    zones:
-      zone_0:
-        coordinates: 128,975,399,898,79,76,37,78
-      zone_1:
-        coordinates: 51,1080,690,1080,101,141,25,146
-      zone_2:
-        coordinates: 130,1080,1407,603,1083,412,0,531
+  # #   ffmpeg:
+  # #     hwaccel_args: preset-nvidia-h264
+  # #     inputs:
+  # #     - path: rtsp://admin:Zse45rdx@192.168.11.36:554/ISAPI/Streaming/Channels/01
+  # #       roles:
+  # #       - record
+  # #       - detect
 
-
-  Reg02_cam17:
-    enabled: true
-
-    ffmpeg:
-      hwaccel_args: preset-vaapi
-      inputs:
-      - path: rtsp://admin:Zse45rdx@192.168.11.178:554/ISAPI/Streaming/Channels/01
-        roles:
-        - record
-        - detect
-
-    zones:
-      zone_0:
-        coordinates: 262,880,1659,217,1579,173,243,660
-      zone_1:
-        coordinates: 25,1080,1733,254,1493,144,0,626
+  # #   zones:
+  # #     zone_0:
+  # #       coordinates: 1754,194,1852,227,550,989,120,587
+  # #     zone_1:
+  # #       coordinates: 750,983,1837,246,1738,210,0,679
+  # #     zone_2:
+  # #       coordinates: 0,1080,801,1080,786,912,0,659
 
 
-  Reg06_cam25:
-    enabled: true
+  # Reg04_cam07:
+  #   enabled: true
 
-    ffmpeg:
-      hwaccel_args: preset-vaapi
-      inputs:
-      - path: rtsp://admin:Zse45rdx@192.168.71.79:554/ISAPI/Streaming/Channels/01
-        roles:
-        - record
-        - detect
-    zones:
-      zone_0:
-        coordinates: 1112,861,176,158,124,170,545,1080
-      zone_1:
-        coordinates: 1920,1080,328,233,140,259,348,1080
-      zone_2:
-        coordinates: 1920,1080,1920,724,738,305,510,359
+  #   ffmpeg:
+  #     hwaccel_args: preset-nvidia-h264
+  #     inputs:
+  #       - path: 
+  #           rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
+  #         roles:
+  #           - record
+  #           - detect
+  #   zones:
+  #     zone_0:
+  #       coordinates: 128,975,399,898,79,76,37,78
+  #     zone_1:
+  #       coordinates: 51,1080,690,1080,101,141,25,146
+  #     zone_2:
+  #       coordinates: 130,1080,1407,603,1083,412,0,531
+
+
+  # Reg02_cam17:
+  #   enabled: true
+
+  #   ffmpeg:
+  #     hwaccel_args: preset-nvidia-h264
+  #     inputs:
+  #       - path: 
+  #           rtsp://admin:Zse45rdx@192.168.11.178:554/ISAPI/Streaming/Channels/01
+  #         roles:
+  #           - record
+  #           - detect
+
+  #   zones:
+  #     zone_0:
+  #       coordinates: 262,880,1659,217,1579,173,243,660
+  #     zone_1:
+  #       coordinates: 25,1080,1733,254,1493,144,0,626
+
+
+  # Reg06_cam25:
+  #   enabled: true
+
+  #   ffmpeg:
+  #     hwaccel_args: preset-nvidia-h264
+  #     inputs:
+  #       - path: 
+  #           rtsp://admin:Zse45rdx@192.168.71.79:554/ISAPI/Streaming/Channels/01
+  #         roles:
+  #           - record
+  #           - detect
+  #   zones:
+  #     zone_0:
+  #       coordinates: 1112,861,176,158,124,170,545,1080
+  #     zone_1:
+  #       coordinates: 1920,1080,328,233,140,259,348,1080
+  #     zone_2:
+  #       coordinates: 1920,1080,1920,724,738,305,510,359
+version: 0.17-0
