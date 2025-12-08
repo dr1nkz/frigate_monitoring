@@ -10,8 +10,8 @@ import cv2
 import numpy as np
 import supervision as sv
 
-from detector import (
-    YOLOv8,
+from detector_rfdetr import (
+    RFDETR,
     Detections,
     BboxesStableframesSpeedsScores,
     draw_external_detection,
@@ -44,7 +44,7 @@ class SpeedEstimator:
     """
 
     def __init__(self, model_path):
-        self.yolov8_detector = YOLOv8(path=model_path,
+        self.rfdetr_detector = RFDETR(path=model_path,
                                       conf_thres=0.3,
                                       iou_thres=0.5)
 
@@ -109,13 +109,13 @@ class SpeedEstimator:
 
             # Detecting
             detected_img = frame.copy()
-            bounding_boxes, scores, class_ids = self.yolov8_detector(
+            bounding_boxes, scores, class_ids = self.rfdetr_detector(
                 detected_img)
             # print(bounding_boxes)
             bounding_boxes = np.array(bounding_boxes)[class_ids == 0]
             scores = np.array(scores)[class_ids == 0]
             class_ids = np.array(class_ids)[class_ids == 0]
-            detected_img = self.yolov8_detector.draw_detections(detected_img)
+            detected_img = self.rfdetr_detector.draw_detections(detected_img)
             if detected_img is None:
                 continue
 
@@ -302,8 +302,9 @@ class SpeedEstimator:
         index = index if index != 0 else 1
         filename = f'{index}_{filename}'
         try:
-            upload_file_to_s3_and_send_mqtt_message(filename, directory, start_time_hms, end_time_hms,
-                                                    median_speed, max_detected_speed, duration)
+            upload_file_to_s3_and_send_mqtt_message(
+                filename, directory, start_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                end_time.strftime("%Y-%m-%dT%H:%M:%SZ"), median_speed, max_detected_speed, duration)
         except Exception as e:
             print(f"Произошла ошибка: {e}")
 

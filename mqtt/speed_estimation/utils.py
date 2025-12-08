@@ -2,6 +2,39 @@ import numpy as np
 from shapely.geometry import Polygon
 
 
+def xywh2xyxy(x):
+    """
+    Конвертация формата рамок из YOLO в VOC
+    """
+    # Конвертация (x, y, w, h) в (x1, y1, x2, y2)
+    # Из yolo формата в VOC
+    y = np.copy(x)
+    y[..., 0] = x[..., 0] - x[..., 2] / 2
+    y[..., 1] = x[..., 1] - x[..., 3] / 2
+    y[..., 2] = x[..., 0] + x[..., 2] / 2
+    y[..., 3] = x[..., 1] + x[..., 3] / 2
+    return y
+
+
+def sigmoid(x):
+    """
+    Вычисление сигмоиду
+    """
+    return 1.0 / (1.0 + np.exp(-x))
+
+
+def box_cxcywh_to_xyxy(boxes):
+    """
+    Конвертация формата рамок из cxcywh в xyxy
+    """
+    cx, cy, w, h = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
+    x1 = cx - w / 2
+    y1 = cy - h / 2
+    x2 = cx + w / 2
+    y2 = cy + h / 2
+    return np.stack([x1, y1, x2, y2], axis=1)
+
+
 def nms(boxes, scores, iou_threshold):
     """
     Алгоритм nms для удаления дублирующихся рамок
