@@ -273,11 +273,11 @@ class RFDETR:
         rng = np.random.default_rng(5)
         colors = rng.uniform(0, 255, size=(len(class_names), 3))
 
-        # Filter only #0 class
+        # Filter only #1 class
         if len(self.boxes) != 0:
-            self.boxes = np.array(self.boxes)[self.class_ids == 0]
-            self.scores = np.array(self.scores)[self.class_ids == 0]
-            self.class_ids = np.array(self.class_ids)[self.class_ids == 0]
+            self.boxes = np.array(self.boxes)[self.class_ids == 1]
+            self.scores = np.array(self.scores)[self.class_ids == 1]
+            self.class_ids = np.array(self.class_ids)[self.class_ids == 1]
 
         for box, score, class_id in zip(self.boxes, self.scores, self.class_ids):
             color = colors[class_id]
