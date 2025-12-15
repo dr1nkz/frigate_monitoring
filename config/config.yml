@@ -85,9 +85,13 @@ detect:
 objects:
   # Optional: list of objects to track from labelmap.txt (default: shown below)
   track:
-    # - cabledrum
     - forklift
+    - cabledrum
   filters:
+    forklift:
+      min_area: 100
+    cabledrum:
+      min_area: 100
     person:
       # Optional: minimum width*height of the bounding box for the detected object (default: 0)
       # min_area: 5000
@@ -112,13 +116,14 @@ detectors:
 
 model:
   model_type: rfdetr
-  width: 576
-  height: 576
+  width: 640
+  height: 640
   input_tensor: nchw
   input_dtype: float
-  path: /config/forklifts_rfdetr_v1.onnx
-  labelmap_path: /config/forklifts_rfdetr_v1_labelmap.txt
-
+  path: /config/forklift.onnx
+  labelmap:
+    0: forklift
+    1: cabledrum
 
 record:
   # Optional: Enable recording (default: shown below)
