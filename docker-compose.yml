@@ -11,32 +11,46 @@ services:
   #   volumes:
   #     - ./nanomq/nanomq.conf:/etc/nanomq.conf
 
+  mediamtx:
+    platform: linux/amd64
+    container_name: mediamtx-server
+    image: bluenviron/mediamtx:latest-ffmpeg
+    environment:
+      - RTSP_PROTOCOLS=tcp
+      - TZ="Europe/Moscow"
+    volumes:
+      - ./mediamtx/mediamtx.yml:/mediamtx.yml
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+     - 8189:8189
+     - 8889:8889/udp
+     - 8889:8889/tcp
+     - 8554:8554
+     - 8555:8555/udp
+    restart: unless-stopped
+
   frigate:
     container_name: frigate
     restart: unless-stopped
-    # build: .
     privileged: true
     shm_size: '192mb'
     image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
     environment:
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
-    # command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
     volumes:
       - ./config:/config
       - ./storage:/media/frigate
-      # - ./mqtt:/mqtt
       - /etc/localtime:/etc/localtime
-      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+      - type: tmpfs
         target: /tmp/cache
         tmpfs:
           size: 1000000000
     ports:
       - "1935:1935"
       - "5000:5000"
-      - "8554:8554" # RTSP feeds
+      # - "8554:8554" # RTSP feeds
       - "1984:1984"
-      # - "8555:8555/tcp" # WebRTC over tcp
-      # - "8555:8555/udp" # WebRTC over udp
     # devices:
     #   - "/dev/dri"
     deploy:

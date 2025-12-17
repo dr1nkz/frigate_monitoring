@@ -51,3 +51,8 @@ MODEL = speed_estimation/clips_model.onnx
     }
 }
 ```
+
+### Стрим в mediamtx с помощью ffmpeg
+```bash
+ffmpeg -re -stream_loop -1 -i clip.mp4 -c copy -f rtsp rtsp://localhost:8554/stream
+```
