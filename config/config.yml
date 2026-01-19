@@ -86,10 +86,11 @@ objects:
   # Optional: list of objects to track from labelmap.txt (default: shown below)
   track:
     - forklift
-    - cabledrum
+    # - cabledrum
   filters:
     forklift:
       min_area: 100
+      min_score: 0.8
     cabledrum:
       min_area: 100
     person:
@@ -161,127 +162,116 @@ cameras:
     ffmpeg:
       hwaccel_args: preset-nvidia-h264
       inputs:
-        - path: 
-            rtsp://192.168.11.2:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
+        - path: rtsp://192.168.11.2:554/user=admin&password=Zse45rdx&channel=1&stream=0.sdp?real_stream
           roles:
             - record
             - detect
-
     zones:
       zone_0:
-        coordinates: 297,979,719,799,122,156,74,168
+        coordinates: 0.117,0.98,0.335,0.848,0.048,0.205,0.028,0.21
         # Optional: Number of consecutive frames required for object to be considered present in the zone (default: shown below).
         inertia: 5
+        loitering_time: 0
       zone_1:
-        coordinates: 268,1080,1131,1080,192,176,61,209
+        coordinates: 0.117,1,0.589,1,0.061,0.183,0.021,0.199
+        inertia: 3
+        loitering_time: 0
       zone_2:
-        coordinates: 932,1080,1873,349,1699,279,0,1080
-
+        coordinates: 0.485,1,0.994,0.419,0.88,0.37,0,1
+        inertia: 3
+        loitering_time: 0
     objects:
       filters:
         forklift:
-          mask:
-            - 349,0,123,101,1043,365,1061,445
+          mask: 0.184,0.156,0.057,0.208,0.335,0.853,0.875,0.375
 
+  Reg05_cam32:
+    enabled: true
 
-  # Reg05_cam32:
+    ffmpeg:
+      hwaccel_args: preset-nvidia-h264
+      inputs:
+        - path: rtsp://admin:Zse45rdx@192.168.71.178:554/ISAPI/Streaming/Channels/01
+          roles:
+            - record
+            - detect
+    zones:
+      zone_0:
+        coordinates: 810,918,447,1039,410,117,444,110
+      zone_1:
+        coordinates: 423,1080,1250,1080,490,197,401,215
+      zone_2:
+        coordinates: 408,343,527,1080,0,1080,97,403
+      zone_3:
+        coordinates: 1621,411,1920,573,1220,1080,866,709
+
+  # Reg02_cam13:
   #   enabled: true
 
   #   ffmpeg:
   #     hwaccel_args: preset-nvidia-h264
   #     inputs:
-  #       - path: 
-  #           rtsp://admin:Zse45rdx@192.168.71.178:554/ISAPI/Streaming/Channels/01
-  #         roles:
-  #           - record
-  #           - detect
+  #     - path: rtsp://admin:Zse45rdx@192.168.11.36:554/ISAPI/Streaming/Channels/01
+  #       roles:
+  #       - record
+  #       - detect
 
   #   zones:
   #     zone_0:
-  #       coordinates: 810,918,447,1039,410,117,444,110
+  #       coordinates: 1754,194,1852,227,550,989,120,587
   #     zone_1:
-  #       coordinates: 423,1080,1250,1080,490,197,401,215
+  #       coordinates: 750,983,1837,246,1738,210,0,679
   #     zone_2:
-  #       coordinates: 408,343,527,1080,0,1080,97,403
-  #     zone_3:
-  #       coordinates: 1621,411,1920,573,1220,1080,866,709
+  #       coordinates: 0,1080,801,1080,786,912,0,659
 
+  Reg04_cam07:
+    enabled: true
+    ffmpeg:
+      hwaccel_args: preset-nvidia-h264
+      inputs:
+        - path: rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
+          roles:
+            - record
+            - detect
+    zones:
+      zone_0:
+        coordinates: 128,975,399,898,79,76,37,78
+      zone_1:
+        coordinates: 51,1080,690,1080,101,141,25,146
+      zone_2:
+        coordinates: 130,1080,1407,603,1083,412,0,531
 
-  # # Reg02_cam13:
-  # #   enabled: true
+  Reg02_cam17:
+    enabled: true
 
-  # #   ffmpeg:
-  # #     hwaccel_args: preset-nvidia-h264
-  # #     inputs:
-  # #     - path: rtsp://admin:Zse45rdx@192.168.11.36:554/ISAPI/Streaming/Channels/01
-  # #       roles:
-  # #       - record
-  # #       - detect
+    ffmpeg:
+      hwaccel_args: preset-nvidia-h264
+      inputs:
+        - path: rtsp://admin:Zse45rdx@192.168.11.178:554/ISAPI/Streaming/Channels/01
+          roles:
+            - record
+            - detect
+    zones:
+      zone_0:
+        coordinates: 262,880,1659,217,1579,173,243,660
+      zone_1:
+        coordinates: 25,1080,1733,254,1493,144,0,626
 
-  # #   zones:
-  # #     zone_0:
-  # #       coordinates: 1754,194,1852,227,550,989,120,587
-  # #     zone_1:
-  # #       coordinates: 750,983,1837,246,1738,210,0,679
-  # #     zone_2:
-  # #       coordinates: 0,1080,801,1080,786,912,0,659
+  Reg06_cam25:
+    enabled: true
+    ffmpeg:
+      hwaccel_args: preset-nvidia-h264
+      inputs:
+        - path: rtsp://admin:Zse45rdx@192.168.71.79:554/ISAPI/Streaming/Channels/01
+          roles:
+            - record
+            - detect
+    zones:
+      zone_0:
+        coordinates: 1112,861,176,158,124,170,545,1080
+      zone_1:
+        coordinates: 1920,1080,328,233,140,259,348,1080
+      zone_2:
+        coordinates: 1920,1080,1920,724,738,305,510,359
 
-
-  # Reg04_cam07:
-  #   enabled: true
-
-  #   ffmpeg:
-  #     hwaccel_args: preset-nvidia-h264
-  #     inputs:
-  #       - path: 
-  #           rtsp://admin:Zse45rdx@192.168.71.7:554/ISAPI/Streaming/Channels/01
-  #         roles:
-  #           - record
-  #           - detect
-  #   zones:
-  #     zone_0:
-  #       coordinates: 128,975,399,898,79,76,37,78
-  #     zone_1:
-  #       coordinates: 51,1080,690,1080,101,141,25,146
-  #     zone_2:
-  #       coordinates: 130,1080,1407,603,1083,412,0,531
-
-
-  # Reg02_cam17:
-  #   enabled: true
-
-  #   ffmpeg:
-  #     hwaccel_args: preset-nvidia-h264
-  #     inputs:
-  #       - path: 
-  #           rtsp://admin:Zse45rdx@192.168.11.178:554/ISAPI/Streaming/Channels/01
-  #         roles:
-  #           - record
-  #           - detect
-
-  #   zones:
-  #     zone_0:
-  #       coordinates: 262,880,1659,217,1579,173,243,660
-  #     zone_1:
-  #       coordinates: 25,1080,1733,254,1493,144,0,626
-
-
-  # Reg06_cam25:
-  #   enabled: true
-
-  #   ffmpeg:
-  #     hwaccel_args: preset-nvidia-h264
-  #     inputs:
-  #       - path: 
-  #           rtsp://admin:Zse45rdx@192.168.71.79:554/ISAPI/Streaming/Channels/01
-  #         roles:
-  #           - record
-  #           - detect
-  #   zones:
-  #     zone_0:
-  #       coordinates: 1112,861,176,158,124,170,545,1080
-  #     zone_1:
-  #       coordinates: 1920,1080,328,233,140,259,348,1080
-  #     zone_2:
-  #       coordinates: 1920,1080,1920,724,738,305,510,359
-version: 0.17-0
+version: 0.16-0
