@@ -17,14 +17,11 @@ services:
     build: .
     privileged: true
     shm_size: '192mb'
-    # image: ghcr.io/blakeblackshear/frigate:stable-tensorrt
     environment:
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
-    # command: [ "python3", "/mqtt/mqtt_events_listener.py" ]
     volumes:
       - ./config:/config
       - ./storage:/media/frigate
-      # - ./mqtt:/mqtt
       - /etc/localtime:/etc/localtime
       - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
         target: /tmp/cache
@@ -37,5 +34,10 @@ services:
       - "1984:1984"
       # - "8555:8555/tcp" # WebRTC over tcp
       # - "8555:8555/udp" # WebRTC over udp
-    devices:
-      - "/dev/dri"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [ gpu ]

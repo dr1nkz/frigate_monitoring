@@ -1,21 +1,18 @@
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04 AS cuda
+
 FROM ghcr.io/blakeblackshear/frigate:0.13.2
-# FROM ghcr.io/blakeblackshear/frigate:stable-tensorrt
 
-RUN \
-    # pip install --upgrade pip \
-    # pip install schedule \
-    pip install --upgrade openvino
+COPY --from=cuda /usr/local/cuda /usr/local/cuda
+COPY --from=cuda /lib/x86_64-linux-gnu/libcudnn* /lib/x86_64-linux-gnu/
 
-RUN apt update && apt install -y zstd
+ENV CUDA_HOME=/usr/local/cuda
+ENV LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH}
+ENV PATH=/usr/local/cuda/bin:${PATH}
 
-# RUN cd $(mktemp -d)
+RUN echo "/usr/local/cuda/targets/x86_64-linux/lib" \
+    > /etc/ld.so.conf.d/cuda.conf && ldconfig
 
-# RUN wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.16510.2/intel-igc-core_1.0.16510.2_amd64.deb
-# RUN wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.16510.2/intel-igc-opencl_1.0.16510.2_amd64.deb
-# RUN wget https://github.com/intel/compute-runtime/releases/download/24.13.29138.7/intel-level-zero-gpu-dbgsym_1.3.29138.7_amd64.ddeb
-# RUN wget https://github.com/intel/compute-runtime/releases/download/24.13.29138.7/intel-level-zero-gpu_1.3.29138.7_amd64.deb
-# RUN wget https://github.com/intel/compute-runtime/releases/download/24.13.29138.7/intel-opencl-icd-dbgsym_24.13.29138.7_amd64.ddeb
-# RUN wget https://github.com/intel/compute-runtime/releases/download/24.13.29138.7/intel-opencl-icd_24.13.29138.7_amd64.deb
-# RUN wget https://github.com/intel/compute-runtime/releases/download/24.13.29138.7/libigdgmm12_22.3.18_amd64.deb
+RUN apt update && apt install -y libgl1
 
-# RUN dpkg -i *.deb
+RUN pip install --no-cache-dir numpy==1.26 onnxruntime-gpu==1.18.1 shapely dotenv opencv-python
+RUN pip install --upgrade openvino

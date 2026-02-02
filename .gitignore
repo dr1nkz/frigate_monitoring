@@ -1,4 +1,5 @@
 # config/db.py
+*.onnx
 storage/recordings
 test.ipynb
 *.jpg
